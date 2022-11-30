@@ -1,0 +1,6 @@
+*.d
+*.o
+main
+main-debug
+.vscode
+replit.nix
