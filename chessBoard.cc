@@ -59,6 +59,17 @@ ChessBoard::ChessBoard() : board(8, vector<Piece *>(8, 0))
   this->board[7][6] = new Knight{'N'};
   this->board[7][7] = new Rook{'R'};
 }
+// dtor
+ChessBoard::~ChessBoard()
+{
+  for (int x = 0; x < 8; x++)
+  {
+    for (int y = 0; y < 8; y++)
+    {
+      delete this->board[x][y];
+    }
+  }
+}
 // Get the copy of the 2D vector
 std::vector<std::vector<Piece *>> ChessBoard::get_board()
 {

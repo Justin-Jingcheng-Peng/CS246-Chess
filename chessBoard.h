@@ -20,6 +20,7 @@ using namespace std;
 class ChessBoard {
 public:
   ChessBoard();
+  ~ChessBoard();
   vector<Move> pastMoves;
   vector<vector<Piece *>> board;
   void move(Position initPos, Position finalPos);
