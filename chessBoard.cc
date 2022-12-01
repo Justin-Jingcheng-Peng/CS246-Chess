@@ -69,6 +69,7 @@ ChessBoard::~ChessBoard()
       delete this->board[x][y];
     }
   }
+  this->round = 'b';
 }
 // Get the copy of the 2D vector
 std::vector<std::vector<Piece *>> ChessBoard::get_board()
@@ -86,6 +87,21 @@ Move ChessBoard::get_last_move()
   return pastMoves.back();
 }
 
+bool ChessBoard::isInBound(Position p1)
+{
+  if (p1.get_x_pos() >= 0 && p1.get_x_pos() <= 7)
+  {
+    if (p1.get_y_pos() >= 0 && p1.get_y_pos() <= 7)
+    {
+      return true;
+    }
+  }
+  return false;
+}
+bool ChessBoard::isInBoundAndNonNull(Position p1)
+{
+  return (this->isInBound(p1) && this->board[p1.get_x_pos()][p1.get_y_pos()] != nullptr);
+}
 // Take two postions. Make the pointer at iniPos pointing to null and make the pointer at the final finalPos pointing at the initPos.
 void ChessBoard::move(Position initPos, Position finalPos)
 {
@@ -93,6 +109,34 @@ void ChessBoard::move(Position initPos, Position finalPos)
   const int init_col = initPos.get_y_pos();
   const int fin_row = finalPos.get_x_pos();
   const int fin_col = finalPos.get_y_pos();
+  // Validility check
+  // Check if the starting postion is null(empty);
+  if (this->board[init_row][init_col] == nullptr)
+  {
+    cout << "Invalid move. There is no Piece in this position" << endl;
+    return;
+  }
+  // Check boundary;
+  if (isInBound(initPos) == false || isInBound(finalPos) == false)
+  {
+    cout << "Invalid move! This move is out of the bound!" << endl;
+    return;
+  }
+  // // Check if white eats white or black eats black;
+  if (this->board[fin_row][fin_col] != nullptr)
+  {
+    if ((this->board[fin_row][fin_col]->get_color() == 'w' && this->board[init_row][init_col]->get_color() == 'w') || (this->board[fin_row][fin_col]->get_color() == 'b' && this->board[init_row][init_col]->get_color() == 'b'))
+    {
+      cout << "Invalid move! This makes one color to eat the same color" << endl;
+      return;
+    }
+  }
+  // Color check;
+  if ((this->round == 'b' && this->board[init_row][init_col]->get_color() == 'w') || (this->round == 'w' && this->board[init_row][init_col]->get_color() == 'b'))
+  {
+    cout << "Invalid move! Wrong color!" << endl;
+    return;
+  }
 
   // The case that no pieces are eaten, do a simple move
   if (this->board[fin_row][fin_col] == nullptr)
@@ -107,20 +151,56 @@ void ChessBoard::move(Position initPos, Position finalPos)
 
     if ((this->board[fin_row][fin_col]->get_color() == 'w' && this->board[init_row][init_col]->get_color() == 'b') || (this->board[fin_row][fin_col]->get_color() == 'b' && this->board[init_row][init_col]->get_color() == 'w'))
     {
-      // There is a bug here;
-
       delete this->board[fin_row][fin_col];
-
       Piece *temp = this->board[init_row][init_col];
       this->board[init_row][init_col] = nullptr;
       this->board[fin_row][fin_col] = temp;
     }
+    else
+    {
+      cout << "Invalid Move! This move is out of the bound!" << endl;
+      return;
+    }
+  }
+  if (this->round == 'b')
+  {
+    this->round = 'w';
+  }
+  else
+  {
+    this->round = 'b';
   }
 }
 
 Piece *ChessBoard::getPieceAt(int x, int y)
 {
   return this->board[x][y];
+}
+bool ChessBoard::isBlackBeingChecked()
+{
+
+  for (int x = 0; x < 8; x++)
+  {
+    for (int y = 0; y < 8; y++)
+    {
+      // find the black king
+      if (this->board[x][y] != nullptr && this->board[x][y]->get_symbol() == 'k')
+      {
+        // check pawn capture;
+        // Check the only two possible positions that the king is being checked by the pawn
+        if ((isInBoundAndNonNull(Position{x + 1, y - 1}) && this->board[x + 1][y - 1]->get_symbol() == 'P') || (isInBoundAndNonNull(Position{x + 1, y + 1}) && this->board[x + 1][y + 1]->get_symbol() == 'P'))
+        {
+          return true;
+        }
+        // check the knight capture;
+        if ((isInBoundAndNonNull(Position{x - 2, y - 1}) && this->board[x - 2][y - 1]->get_symbol() == 'N') || (isInBoundAndNonNull(Position{x - 1, y - 2}) && this->board[x - 1][y - 2]->get_symbol() == 'N') || (isInBoundAndNonNull(Position{x + 1, y - 2}) && this->board[x + 1][y - 2]->get_symbol() == 'N') || (isInBoundAndNonNull(Position{x + 2, y - 1}) && this->board[x + 2][y - 1]->get_symbol() == 'N') || (isInBoundAndNonNull(Position{x + 2, y + 1}) && this->board[x + 2][y + 1]->get_symbol() == 'N') || (isInBoundAndNonNull(Position{x + 1, y + 2}) && this->board[x + 1][y + 2]->get_symbol() == 'N') || (isInBoundAndNonNull(Position{x - 2, y + 1}) && this->board[x - 2][y + 1]->get_symbol() == 'N') || (isInBoundAndNonNull(Position{x - 1, y + 2}) && this->board[x - 1][y + 2]->get_symbol() == 'N'))
+        {
+          return true;
+        }
+            }
+    }
+  }
+  return false;
 }
 
 int ChessBoard::isGameFinish()
@@ -149,9 +229,16 @@ int ChessBoard::getLastMove()
 
 void ChessBoard::printBoard()
 {
+  cout << "  ";
+  for (int i = 0; i < 8; i++)
+  {
+    cout << i << " ";
+  }
+  cout << endl;
+
   for (int x = 0; x < 8; x++)
   {
-    cout << "|";
+    cout << x << "|";
     for (int y = 0; y < 8; y++)
     {
       if (this->board[x][y] != nullptr)

@@ -1,21 +1,28 @@
 #include "piece.h"
 #include <iostream>
-using namespace std; 
-Piece::Piece(char symbol): symbol{symbol} {}
-Piece::~Piece(){
-  cout << "dtor called" << endl;
-}
-char Piece::get_symbol() {
+using namespace std;
+Piece::Piece(char symbol) : symbol{symbol} {}
+Piece::~Piece() {}
+char Piece::get_symbol()
+{
   return this->symbol;
 }
 
-char Piece::get_type() {
+char Piece::get_type()
+{
   return this->symbol - 'a';
 }
 
-char Piece::get_color() {
-  if (this->symbol >= 'a' && this->symbol <= 'z') {return 'b';}
-  else {return 'w';}
+char Piece::get_color()
+{
+  if (this->symbol >= 'a' && this->symbol <= 'z')
+  {
+    return 'b';
+  }
+  else
+  {
+    return 'w';
+  }
 }
 
 // bool Piece::isKingChecked(){

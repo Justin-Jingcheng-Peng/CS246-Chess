@@ -14,27 +14,31 @@
 #include <string>
 #include <vector>
 
-
 using namespace std;
 
-class ChessBoard {
+class ChessBoard
+{
 public:
+  char round;
   ChessBoard();
   ~ChessBoard();
+
   vector<Move> pastMoves;
   vector<vector<Piece *>> board;
-  void move(Position initPos, Position finalPos);
+
+  vector<vector<Piece *>> get_board();
   Piece *getPieceAt(int x, int y);
-  int isGameFinish();
-  int getLastMove();
-  void setup_addPiece(string newPieceName);
-  void setup_removePiece(Position pos);
-  vector<vector<Piece*>> get_board();
-  int get_num_moves();
   Move get_last_move(); // returns the most recent move
-  /*Testing functions*/
+
+  bool isInBound(Position p1);
+  bool isInBoundAndNonNull(Position p1);
+  bool isBlackBeingChecked();
+  void move(Position initPos, Position finalPos);
   void printBoard();
   void setNewPiece(int x, int y, char symbol);
+  int isGameFinish();
+  int getLastMove();
+  int get_num_moves();
 };
 
 #endif
