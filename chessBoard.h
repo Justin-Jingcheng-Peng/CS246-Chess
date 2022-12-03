@@ -9,7 +9,6 @@
 #include "queen.h"
 #include "rook.h"
 #include "knight.h"
-// #include "subject.h"
 #include <iostream>
 #include <string>
 #include <vector>
@@ -18,27 +17,38 @@ using namespace std;
 
 class ChessBoard
 {
+private:
+  void move(Position initPos, Position finalPos, bool is_castling);
+
 public:
   char round;
-  ChessBoard();
-  ~ChessBoard();
-
   vector<Move> pastMoves;
   vector<vector<Piece *>> board;
 
+  ChessBoard();
+  ~ChessBoard();
+
   vector<vector<Piece *>> get_board();
   Piece *getPieceAt(int x, int y);
-  Move get_last_move(); // returns the most recent move
+  Move get_last_move();
+  
 
   bool isInBound(Position p1);
   bool isInBoundAndNonNull(Position p1);
   bool isBlackBeingChecked();
-  void move(Position initPos, Position finalPos);
-  void printBoard();
+  bool isWhiteBeingChecked();
+  bool isBlackLost();
+  bool isWhiteLost();
+
+  void undo();
+  void standardMove(Position initPos, Position finalPos);
+  void castlingMove(char direction, char color);
+  void enpassantMove(Position initPos, Position finalPos, Position eatenPiecePosition);
+  void promotionMove(Position initPos, Position finalPos, char pieceTurnedTo);
+  void printBoardWithXYCordinates();
+  void printBoardWithStandardCordinates();
   void setNewPiece(int x, int y, char symbol);
-  int isGameFinish();
-  int getLastMove();
-  int get_num_moves();
+  bool isGameFinish();
 };
 
 #endif

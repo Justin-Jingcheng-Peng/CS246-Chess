@@ -1,6 +1,6 @@
 CXX=g++
 CXXFLAGS=-std=c++14 -Wall -g -MMD
-OBJECTS=main.o chessBoard.o pawn.o position.o piece.o queen.o bishop.o rook.o king.o knight.o
+OBJECTS=main.o chessBoard.o pawn.o position.o piece.o queen.o bishop.o rook.o king.o knight.o move.o
 EXEC=main
 
 ${EXEC}: ${OBJECTS}
