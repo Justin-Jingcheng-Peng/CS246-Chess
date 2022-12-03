@@ -2,6 +2,7 @@
 #define ROOK_H
 #include "piece.h"
 #include <cmath>
+#include <vector>
 
 class Rook: public Piece {
   private:  
@@ -11,7 +12,6 @@ class Rook: public Piece {
     Rook(char symbol);
     // Checks if the Rook move is valid
     bool valid_move(ChessBoard* bo, Position pos1, Position pos2) override;
-    void add_move_count();
 };
 
 #endif

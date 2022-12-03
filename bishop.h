@@ -2,6 +2,7 @@
 #define BISHOP_H
 #include "piece.h"
 #include <cmath>
+#include <vector>
 
 class Bishop: public Piece {
   private:  

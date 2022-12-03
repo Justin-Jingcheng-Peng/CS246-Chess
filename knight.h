@@ -2,6 +2,7 @@
 #define KNIGHT_H
 #include "piece.h"
 #include <cmath>
+#include <vector>
 
 class Knight: public Piece {
   private:  
