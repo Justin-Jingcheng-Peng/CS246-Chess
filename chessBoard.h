@@ -15,6 +15,17 @@
 
 using namespace std;
 
+class Error
+{
+private:
+  string errorMessage;
+public:
+  Error(string errorMessage) : errorMessage{errorMessage} {}
+  string get_error_message() {
+    return errorMessage;
+  }
+}
+
 class ChessBoard
 {
 private:
