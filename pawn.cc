@@ -6,7 +6,6 @@ Pawn::Pawn(char symbol) : Piece{symbol} {}
 
 bool Pawn::valid_move(ChessBoard* bo, Position pos1, Position pos2) {
   std::vector<std::vector<Piece*>> board = bo->get_board();
-  // int step = ((this->get_color() == 'w') ? -1 : 1);
   int dist_row = abs(pos1.get_x_pos() - pos2.get_x_pos());
   int dist_col = abs(pos1.get_y_pos() - pos2.get_y_pos());
   if (dist_row == 1 && pos1.get_y_pos() == pos2.get_y_pos() && board[pos2.get_x_pos()][pos2.get_y_pos()] == nullptr) {return true;}
