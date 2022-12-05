@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <random>
+#include <memory>
 
 using namespace std;
 
@@ -133,4 +134,12 @@ int ComputerPlayer::num_of_attackable_pieces(ChessBoard *chessBoard) {
   }
   
   return num;
+}
+
+// Generates a random number n to get the nth element of a vector/array of moves
+int ComputerPlayer::randomizer(int a, int b) {
+  random_device d;
+  mt19937 rng(d());
+  uniform_int_distribution<mt19937::result_type> dist(a, b - 1);
+  return dist(rng);
 }

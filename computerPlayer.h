@@ -17,6 +17,7 @@ protected:
   vector<vector<Position>> get_check_moves(ChessBoard *chessBoard, vector<vector<Position>> moves);
   vector<vector<Position>> get_checkmate_moves(ChessBoard *chessBoard, vector<vector<Position>> moves);
   int num_of_attackable_pieces(ChessBoard *chessBoard);
+  int randomizer(int a, int b);
 public:
   virtual ~Computer() = default;
   virtual vector<Position> play(ChessBoard *chessBoard) = 0;
