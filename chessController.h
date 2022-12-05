@@ -16,9 +16,9 @@ public:
   void move(string move_commands);
   void undo();
   void setup();
-  void setup_addPiece();
-  void setup_removePiece();
-  void setup_setColorTurn();
+  void setup_addPiece(char piece, string position);
+  void setup_removePiece(string position);
+  void setup_setColorTurn(char color);
   void setup_done();
 };
 
