@@ -5,7 +5,7 @@
 
 using namespace std;
 
-vector<Position> play(ChessBoard *chessBoard) {
+vector<Position> LevelTwo::play(ChessBoard *chessBoard) {
   vector<vector<Position>> moves = get_moves(chessBoard, chessBoard->get_turn());
   vector<vector<Position>> attackingMoves = get_attacking_moves(chessBoard, chessBoard->get_turn());
   vector<vector<Position>> checkMoves = get_check_moves(chessBoard, chessBoard->get_turn());
@@ -16,5 +16,5 @@ vector<Position> play(ChessBoard *chessBoard) {
 
   if (numOfAttackingMoves != 0) return attackingMoves[get_random(0, numOfAttackingMoves)];
   if (numOfCheckMoves != 0) return checkMoves[get_random(0, numOfCheckMoves)];
-  else return moves[get_random(0, numOfMoves)]
+  else return moves[get_random(0, numOfMoves)];
 }

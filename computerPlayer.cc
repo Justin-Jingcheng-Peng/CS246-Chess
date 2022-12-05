@@ -77,7 +77,7 @@ vector<vector<Position>> ComputerPlayer::get_escaping_moves(ChessBoard *chessBoa
   return escapingMoves;
 }
 
-vector<vector<Position>> get_check_moves(ChessBoard *chessBoard, vector<vector<Position>> moves) {
+vector<vector<Position>> ComputerPlayer::get_check_moves(ChessBoard *chessBoard, vector<vector<Position>> moves) {
   vector<vector<Position>> checkMoves;
   vector<vector<shared_ptr<Piece>>> theBoard = chessBoard->get_board();
 
@@ -98,7 +98,7 @@ vector<vector<Position>> get_check_moves(ChessBoard *chessBoard, vector<vector<P
   return checkMoves;
 }
 
-vector<vector<Position>> get_checkmate_moves(ChessBoard *chessBoard, vector<vector<Position>> moves) {
+vector<vector<Position>> ComputerPlayer::get_checkmate_moves(ChessBoard *chessBoard, vector<vector<Position>> moves) {
   vector<vector<Position>> checkmateMoves;
 
   int numOfMoves = moves.size();
