@@ -118,7 +118,7 @@ void ChessBoard::standardMove(Position initPos, Position finalPos)
 {
   this->move(initPos, finalPos, false);
 }
-// This is an internal function that is has a lot of logic in it. Thus this is private.
+// This is an internal function that has a lot of logic in it. Thus this is private.
 void ChessBoard::move(Position initPos, Position finalPos, bool is_castling)
 {
   const int init_row = initPos.get_x_pos();

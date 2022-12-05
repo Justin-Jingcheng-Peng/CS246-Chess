@@ -1,5 +1,5 @@
-#ifndef COMPUTERPLAYER_H
-#define COMPUTERPLAYER_H
+#ifndef COMPUTER_H
+#define COMPUTER_H
 
 #include <vector>
 
@@ -16,9 +16,9 @@ protected:
   vector<vector<Position>> get_escaping_moves(ChessBoard *chessBoard, vector<vector<Position>> moves);
   vector<vector<Position>> get_check_moves(ChessBoard *chessBoard, vector<vector<Position>> moves);
   vector<vector<Position>> get_checkmate_moves(ChessBoard *chessBoard, vector<vector<Position>> moves);
-  int numOfAttackablePieces(ChessBoard *chessBoard);
+  int num_of_attackable_pieces(ChessBoard *chessBoard);
 public:
-  virtual ~ComputerPlayer() = default;
+  virtual ~Computer() = default;
   virtual vector<Position> play(ChessBoard *chessBoard) = 0;
 };
 
