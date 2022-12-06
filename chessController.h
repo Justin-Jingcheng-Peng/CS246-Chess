@@ -1,6 +1,7 @@
 #ifndef CHESS_CONTROLLER_H
 #define CHESS_CONTROLLER_H
 #include "chessBoard.h"
+#include <memory>
 #include "position.h"
 
 using namespace std;

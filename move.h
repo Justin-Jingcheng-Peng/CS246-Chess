@@ -8,7 +8,7 @@ class Piece;
 
 class Move
 {
-public:
+private:
   std::shared_ptr<Piece> piece;
   std::shared_ptr<Piece> removed_piece;  // The piece that was removed
   Position original_pos; // The position of the moved_piece before being moved.
@@ -16,7 +16,7 @@ public:
   bool is_castling;      // Determine if this move is the "LAST" move of a castling move. We consider castling as two individual moves.
   bool is_enpassant;
   bool is_promotion;
-
+public:
   // Ctor for Move
   Move(std::shared_ptr<Piece> piece, std::shared_ptr<Piece> removed_piece,Position original_pos, Position final_pos, bool is_castling, bool is_enpassant, bool is_promotion);
   // getter for piece field
