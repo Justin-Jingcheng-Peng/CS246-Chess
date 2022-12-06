@@ -7,7 +7,7 @@
 #include <map>
 #include "chessBoard.h"
 
-using namespace string;
+using namespace std;
 
 class TextObserver : public Observer {
   ChessBoard *chessBoard;

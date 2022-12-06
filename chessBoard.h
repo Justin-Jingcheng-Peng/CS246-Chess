@@ -35,7 +35,7 @@ class ChessBoard: public Subject {
     private:
       vector<vector<shared_ptr<Piece>>> board;
       vector<Move> pastMoves;
-      map<char, shared_ptr<Computer>> computer;
+      map<char, shared_ptr<ComputerPlayer>> computer;
       map<string, int> score;
       map<char, string> player;
       string mode;

@@ -19,7 +19,7 @@ protected:
   int num_of_attackable_pieces(ChessBoard *chessBoard);
   int randomizer(int a, int b);
 public:
-  virtual ~Computer() = default;
+  virtual ~ComputerPlayer() = default;
   virtual vector<Position> play(ChessBoard *chessBoard) = 0;
 };
 

@@ -8,7 +8,7 @@
 using namespace std;
 
 class LevelFour : public ComputerPlayer {
-  vector<Position> play(ChessBoard *chessBoard) overide;
+  vector<Position> play(ChessBoard *chessBoard) override;
 };
 
 #endif

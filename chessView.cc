@@ -1,5 +1,6 @@
 #include "chessController.h"
 #include "chessView.h"
+#include "chessBoard.h"
 #include "observer.h"
 #include "textObserver.h"
 #include "graphicsObserver.h"
@@ -9,15 +10,15 @@ using namespace std;
 
 void ChessView::run() {
   string command;
-  auto chessBoard = make_shared<Board>();
+  auto board = make_shared<ChessBoard>();
   vector<shared_ptr<Observer>> observer;
 
-  auto textObserver = make_shared<TextObserver>(chessBoard.get());
-  auto graphicsObserver = make_shared<GraphicsObserver>(chessBoard.get());
+  auto textObserver = make_shared<TextObserver>(board.get());
+  auto graphicsObserver = make_shared<GraphicsObserver>(board.get());
   observer.push_back(textObserver);
   observer.push_back(graphicsObserver);
   
-  ChessController chessController = ChessController(chessBoard.get());
+  ChessController chessController = ChessController(board.get());
   
   while (cin >> command) {
     // Starts a new game
@@ -27,11 +28,11 @@ void ChessView::run() {
         string player2;
 
         cin >> player1 >> player2;
-        chessController.start();
+        chessController.start_game(player1, player2);
       }
 
-      catch (GameError err) {
-        cout << "Game error: " << err.get_message() << endl;
+      catch (Error err) {
+        cout << "Game error: " << err.get_msg() << endl;
       }
     }
 
@@ -41,8 +42,8 @@ void ChessView::run() {
         chessController.resign();
       }
 
-      catch (GameError err) {
-        cout << "Game error: " << err.get_message() << endl;
+      catch (Error err) {
+        cout << "Game error: " << err.get_msg() << endl;
       }
     }
 
@@ -51,11 +52,11 @@ void ChessView::run() {
       try {
         string commands;
         getline(cin, commands);
-        chessControllermove(commands);
+        chessController.move(commands);
       }
 
-      catch (GameError err) {
-        cout << "Game error: " << err.get_message() << endl;
+      catch (Error err) {
+        cout << "Game error: " << err.get_msg() << endl;
       }
     }
 
@@ -65,8 +66,8 @@ void ChessView::run() {
         chessController.undo();
       }
 
-      catch (GameError err) {
-        cout << "Game error: " << err.get_message() << endl;
+      catch (Error err) {
+        cout << "Game error: " << err.get_msg() << endl;
       }
     }
 
@@ -76,8 +77,8 @@ void ChessView::run() {
        chessController.setup(); 
       }
 
-      catch (GameError err) {
-        cout << "Game error: " << err.get_message() << endl;
+      catch (Error err) {
+        cout << "Game error: " << err.get_msg() << endl;
       }
     }
 
@@ -91,11 +92,11 @@ void ChessView::run() {
         cin >> piece >> square;
 
         chessController.setup_add_piece(piece, square);
-        chessBoard->notifyObservers("n");
+        board->notifyObservers("n");
       }
 
-      catch (GameError err) {
-        cout << "Game error: " << err.get_message() << endl;
+      catch (Error err) {
+        cout << "Game error: " << err.get_msg() << endl;
       }
     }
 
@@ -106,11 +107,11 @@ void ChessView::run() {
         cin >> square;
 
         chessController.setup_remove_piece(square);
-        chessBoard->notifyObservers("n");
+        board->notifyObservers("n");
       }
 
-      catch (GameError err) {
-        cout << "Game error: " << err.get_message() << endl;
+      catch (Error err) {
+        cout << "Game error: " << err.get_msg() << endl;
       }      
     }
 
@@ -121,11 +122,11 @@ void ChessView::run() {
         cin >> color;
 
         chessController.setup_set_turn(color);
-        chessBoard->notifyObservers("n");
+        board->notifyObservers("n");
       }
 
-      catch (GameError err) {
-        cout << "Game error: " << err.get_message() << endl;
+      catch (Error err) {
+        cout << "Game error: " << err.get_msg() << endl;
       }     
     }
 
@@ -135,8 +136,8 @@ void ChessView::run() {
         chessController.setup_done();
       }
 
-      catch (GameError err) {
-        cout << "Game error: " << err.get_message() << endl;
+      catch (Error err) {
+        cout << "Game error: " << err.get_msg() << endl;
       }     
     }
   }

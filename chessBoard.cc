@@ -394,10 +394,10 @@ void ChessBoard::start_game() {
 
 void ChessBoard::add_player(string name, char color) {
     this->player[color] = name;
-    if (name == "computer 1") {}
-    else if (name == "computer 2") {}
-    else if (name == "computer 3") {}
-    else if (name == "computer 4") {}
+    if (name == "computer 1") {computer[color] = make_shared<LevelOne>();}
+    else if (name == "computer 2") {computer[color] = make_shared<LevelTwo>();}
+    else if (name == "computer 3") {computer[color] = make_shared<LevelThree>();}
+    else if (name == "computer 4") {computer[color] = make_shared<LevelFour>();}
 }
 
 void ChessBoard::setup_add_piece(shared_ptr<Piece> piece, Position pos) {

@@ -18,12 +18,12 @@ vector<vector<Position>> ComputerPlayer::get_moves(ChessBoard *chessBoard, char 
 
   for (int i = 0; i < 8; i++) {
     for (int j = 0; j < 8; j++) {
-      if (chessBoard[i][j]->get_color() == color && chessBoard[i][j] != nullptr) {
+      if (theBoard[i][j]->get_color() == color && theBoard[i][j] != nullptr) {
         for (int k = 0; k < 8; k++) {
           for (int l = 0; l < 8; l++) {
-            if (chessBoard[i][j]->valid_move(theBoard, Position(j,i), Position(l,k))) {
+            if (theBoard[i][j]->valid_move(chessBoard, Position(j,i), Position(l,k))) {
               try {
-                theBoard->move(Position(j,i), Position(l,k), true);
+                chessBoard->move(Position(j,i), Position(l,k), true);
               }
 
               catch (Error err) {
@@ -31,7 +31,7 @@ vector<vector<Position>> ComputerPlayer::get_moves(ChessBoard *chessBoard, char 
               }
               
               if (!chessBoard->is_pos_in_check(kingPosition, chessBoard->get_turn())) {
-                moves.emplace_back({Position(j,i), Position(l,k)});
+                moves.emplace_back(Position(j,i), Position(l,k));
               }
 
               chessBoard->undo();
@@ -57,7 +57,7 @@ vector<vector<Position>> ComputerPlayer::get_attacking_moves(ChessBoard *chessBo
     int x = moves[i][1].get_x_pos();
     int y = moves[i][1].get_y_pos();
     
-    if (board[x][y] != nullptr) {
+    if (theBoard[x][y] != nullptr) {
       attackingMoves.emplace_back(moves[i]);
     }
   }
@@ -88,8 +88,8 @@ vector<vector<Position>> ComputerPlayer::get_check_moves(ChessBoard *chessBoard,
   vector<vector<shared_ptr<Piece>>> theBoard = chessBoard->get_board();
 
   int numOfMoves = moves.size();
-  char king = (board_obj->get_turn() == 'b' ? 'K' : 'k');
-  char color = (board_obj->get_turn() == 'b' ? 'w' : 'b');
+  char king = (chessBoard->get_turn() == 'b' ? 'K' : 'k');
+  char color = (chessBoard->get_turn() == 'b' ? 'w' : 'b');
   Position kingPosition = chessBoard->get_piece_pos(king);
 
   for (int i = 0; i < numOfMoves; i++) {
@@ -132,7 +132,7 @@ int ComputerPlayer::num_of_attackable_pieces(ChessBoard *chessBoard) {
     for (int j = 0; j < 0; j++) {
       if (theBoard[i][j] != nullptr && 
       (theBoard[i][j]->get_color() == chessBoard->get_turn()) && 
-      theBoard[i][j]->get_piece_type() == 'K' &&
+      theBoard[i][j]->get_type() == 'K' &&
       chessBoard->is_pos_in_check(Position(i,j), chessBoard->get_turn())) {
         num++;
       }

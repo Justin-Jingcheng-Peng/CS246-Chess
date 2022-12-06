@@ -5,9 +5,9 @@
 
 vector<Position> LevelThree::play(ChessBoard *chessBoard) {
   vector<vector<Position>> moves = get_moves(chessBoard, chessBoard->get_turn());
-  vector<vector<Position>> attackingMoves = get_attacking_moves(chessBoard, chessBoard->get_turn());
-  vector<vector<Position>> escapingMoves = get_attacking_moves(chessBoard, chessBoard->get_turn());
-  vector<vector<Position>> checkMoves = get_check_moves(chessBoard, chessBoard->get_turn());
+  vector<vector<Position>> attackingMoves = get_attacking_moves(chessBoard, moves);
+  vector<vector<Position>> escapingMoves = get_escaping_moves(chessBoard, moves);
+  vector<vector<Position>> checkMoves = get_check_moves(chessBoard, moves);
 
   int numOfMoves = moves.size();
   int numOfAttackingMoves = attackingMoves.size();

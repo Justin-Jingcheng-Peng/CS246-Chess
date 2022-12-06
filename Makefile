@@ -1,22 +1,15 @@
 CXX=g++
-CXXFLAGS=-std=c++14 -Wall -g -MMD
-OBJECTS=main.o chessBoard.o pawn.o position.o piece.o queen.o bishop.o rook.o king.o knight.o move.o
-EXEC=main
+CXXFLAGS=-std=c++14 -g -Werror=vla -Wall -MMD
+OBJECTS=main.o chessBoard.o position.o piece.o queen.o bishop.o rook.o king.o knight.o pawn.o move.o chessController.o chessView.o computerPlayer.o levelOne.o levelTwo.o levelThree.o levelFour.o observer.o textObserver.o graphicsObserver.o subject.o window.o
+DEPENDS=${OBJECTS:.o=.d}
+EXEC=chess
 
 ${EXEC}: ${OBJECTS}
-	${CXX} ${CXXFLAGS} ${OBJECTS} -o ${EXEC}
+	${CXX} ${CXXFLAGS} ${OBJECTS} -lX11 -o ${EXEC}
 
+-include ${DEPENDS}
 
 .PHONY: clean
 
 clean :
-	rm ${OBJECTS} ${EXEC} *.d
-
-## Makefile for one simple C++ file
-# CXX=g++
-# CXXFLAGS=-std=c++14 -Wall -g -MMD
-# OBJECTS=main.o 
-# EXEC=main
-
-# ${EXEC}: ${OBJECTS}
-# 	${CXX} ${CXXFLAGS} ${OBJECTS} -o ${EXEC}
+	rm ${OBJECTS} ${EXEC} ${DEPENDS}

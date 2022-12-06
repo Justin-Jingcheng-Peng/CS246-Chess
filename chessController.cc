@@ -17,7 +17,7 @@ ChessController::ChessController(ChessBoard *chessBoard) : chessBoard{chessBoard
 
 void ChessController::start_game(string player1, string player2) {
   if (chessBoard->get_mode() != "pre_game") {
-    throw GameError{"The current game mode is " + board->get_mode()};
+    throw Error{"The current game mode is " + chessBoard->get_mode()};
   }
 
   chessBoard->add_player(player1, 'w');
@@ -27,7 +27,7 @@ void ChessController::start_game(string player1, string player2) {
 
 void ChessController::resign() {
   if (chessBoard->get_mode() != "game") {
-    throw GameError{"The current game mode is " + board->get_mode()};
+    throw Error{"The current game mode is " + chessBoard->get_mode()};
   }
 
   chessBoard->resign();
@@ -35,13 +35,13 @@ void ChessController::resign() {
 
 void ChessController::move(string move_commands) {
   if (chessBoard->get_mode() != "game") {
-    throw GameError{"The current game mode is " + board->get_mode()};
+    throw Error{"The current game mode is " + chessBoard->get_mode()};
   }
 
   else if (move_commands == "") chessBoard->computer_move();
 
   else {
-    string mc;
+    string mc[3];
     istringstream iss{move_commands};
     int size = 0;
     
@@ -61,7 +61,7 @@ void ChessController::move(string move_commands) {
 
 void ChessController::undo() {
   if (chessBoard->get_mode() != "game") {
-    throw GameError{"The current game mode is " + board->get_mode()};
+    throw Error{"The current game mode is " + chessBoard->get_mode()};
   }
 
   chessBoard->undo_all();
@@ -69,7 +69,7 @@ void ChessController::undo() {
 
 void ChessController::setup() {
   if (chessBoard->get_mode() != "pre_game") {
-    throw GameError{"The current game mode is " + board->get_mode()};
+    throw Error{"The current game mode is " + chessBoard->get_mode()};
   }
 
   chessBoard->setup();
@@ -77,7 +77,7 @@ void ChessController::setup() {
 
 void ChessController::setup_add_piece(char piece, string position) {
   if (chessBoard->get_mode() != "setup") {
-    throw GameError{"The current game mode is " + board->get_mode()};
+    throw Error{"The current game mode is " + chessBoard->get_mode()};
   }
 
   if (piece == 'K' || piece == 'k') {
@@ -102,7 +102,7 @@ void ChessController::setup_add_piece(char piece, string position) {
 
 void ChessController::setup_remove_piece(string position) {
   if (chessBoard->get_mode() != "setup") {
-    throw GameError{"The current game mode is " + board->get_mode()};
+    throw Error{"The current game mode is " + chessBoard->get_mode()};
   }
 
   chessBoard->setup_remove_piece(create_position(position));
@@ -110,15 +110,15 @@ void ChessController::setup_remove_piece(string position) {
 
 void ChessController::setup_set_turn(char color) {
   if (chessBoard->get_mode() != "setup") {
-    throw GameError{"The current game mode is " + board->get_mode()};
+    throw Error{"The current game mode is " + chessBoard->get_mode()};
   }
 
-  chessBoard->setup_set_turn();
+  chessBoard->setup_set_turn(color);
 }
 
 void ChessController::setup_done() {
   if (chessBoard->get_mode() != "setup") {
-    throw GameError{"The current game mode is " + board->get_mode()};
+    throw Error{"The current game mode is " + chessBoard->get_mode()};
   }
 
   chessBoard->setup_done();
@@ -128,7 +128,7 @@ Position ChessController::create_position(string coordinate) {
   Position coord = Position(coordinate[0] - 'a', 7 - coordinate[1] + '1');
   
   if (coord.get_x_pos() < 0 || coord.get_y_pos() < 0 || coord.get_x_pos() > 7 || coord.get_y_pos() > 7) {
-		throw GameError{"It is not a valid position."};
+		throw Error{"It is not a valid position."};
 	}
   
   return coord;
