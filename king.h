@@ -3,7 +3,7 @@
 #include "piece.h"
 #include <cmath>
 #include <vector>
-#include <
+#include <memory>
 
 class King: public Piece {
   private:  

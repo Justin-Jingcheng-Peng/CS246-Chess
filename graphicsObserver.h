@@ -13,7 +13,7 @@ using namespace std;
 class GraphicsObserver : public Observer {
   ChessBoard *chessBoard;
   shared_ptr<Xwindow> window = nullptr;
-  bool is_red = false;
+  bool isRed = false;
 public:
   GraphicsObserver(ChessBoard *chessBoard);
   ~GraphicsObserver();
