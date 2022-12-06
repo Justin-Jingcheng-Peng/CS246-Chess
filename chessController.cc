@@ -47,15 +47,18 @@ void ChessController::move(string move_commands) {
     
     while (iss >> mc[size]) size++;
 
-    Position from = create_position(mc[0]);
-    Position to = create_position(mc[1]);
-
     if (size == 3) {
+      Position from = create_position(mc[0]);
+      Position to = create_position(mc[1]);
       char promotedPawn = mc[2][0];
       chessBoard->move_promote(from, to, promotedPawn);
     }
 
-    else chessBoard->move(from, to, false);
+    else {
+      Position from = create_position(mc[0]);
+      Position to = create_position(mc[1]);
+      chessBoard->move(from, to, false);
+    }
   }
 }
 
@@ -127,7 +130,7 @@ void ChessController::setup_done() {
 Position ChessController::create_position(string coordinate) {
   Position coord = Position(coordinate[0] - 'a', 7 - coordinate[1] + '1');
   
-  if (coord.get_x_pos() < 0 || coord.get_y_pos() < 0 || coord.get_x_pos() > 7 || coord.get_y_pos() > 7) {
+  if (coord.get_x_pos() < 0 || coord.get_x_pos() > 7 || coord.get_y_pos() < 0 || coord.get_y_pos() > 7) {
 		throw Error{"It is not a valid position."};
 	}
   

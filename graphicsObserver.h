@@ -1,23 +1,21 @@
-#ifndef GRAPHICSOBSERVER_H
-#define GRAPHICSOBSERVER_H
+#ifndef _GRAPHICSOBSERVER_H_
+#define _GRAPHICSOBSERVER_H_
 #include <vector>
-#include <cstdlib>
-#include <cmath>
-#include "chessBoard.h"
 #include "observer.h"
-#include "window.h"
 #include <memory>
+#include "window.h"
+#include "chessBoard.h"
 
-using namespace std;
-
-class GraphicsObserver : public Observer {
-  ChessBoard *chessBoard;
-  shared_ptr<Xwindow> window = nullptr;
-  bool isRed = false;
+class GraphicsObserver : public Observer
+{
+  ChessBoard * board;
+  //Xwindow *xw = nullptr;
+  std::shared_ptr<Xwindow> xw = nullptr;
+  bool is_red = false;
 public:
-  GraphicsObserver(ChessBoard *chessBoard);
+  GraphicsObserver(ChessBoard * board);
+  void notify(std::string result) override;
   ~GraphicsObserver();
-  void notify(string gameResult) override;
 };
 
 #endif

@@ -13,10 +13,8 @@ void ChessView::run() {
   auto board = make_shared<ChessBoard>();
   vector<shared_ptr<Observer>> observer;
 
-  auto textObserver = make_shared<TextObserver>(board.get());
-  auto graphicsObserver = make_shared<GraphicsObserver>(board.get());
-  observer.push_back(textObserver);
-  observer.push_back(graphicsObserver);
+  observer.push_back(make_shared<TextObserver>(board.get()));
+  observer.push_back(make_shared<GraphicsObserver>(board.get()));
   
   ChessController chessController = ChessController(board.get());
   
@@ -37,7 +35,7 @@ void ChessView::run() {
     }
 
     // Concedes game to the opponent
-    else if (command == "resign") {
+    if (command == "resign") {
       try {
         chessController.resign();
       }
@@ -48,7 +46,7 @@ void ChessView::run() {
     }
 
     // Moves a piece
-    else if (command == "move") {
+    if (command == "move") {
       try {
         string commands;
         getline(cin, commands);
@@ -61,7 +59,7 @@ void ChessView::run() {
     }
 
     // Undo previous move
-    else if (command == "undo") {
+    if (command == "undo") {
       try {
         chessController.undo();
       }
@@ -72,7 +70,7 @@ void ChessView::run() {
     }
 
     // Enter setup mode, allowing the user to set up their own initial board configurations
-    else if (command == "setup") {
+    if (command == "setup") {
       try {
        chessController.setup(); 
       }
@@ -85,7 +83,7 @@ void ChessView::run() {
     /* The following commands are used during setup mode */
 
     // Adds a piece on a square
-    else if (command == "+") {
+    if (command == "+") {
       try {
         char piece;
         string square;
@@ -101,7 +99,7 @@ void ChessView::run() {
     }
 
     // Removes a piece from a square
-    else if (command == "-") {
+    if (command == "-") {
       try {
         string square;
         cin >> square;
@@ -116,7 +114,7 @@ void ChessView::run() {
     }
 
     // Makes it color's turn to go next
-    else if (command == "=") {
+    if (command == "=") {
       try {
         char color;
         cin >> color;
@@ -131,7 +129,7 @@ void ChessView::run() {
     }
 
     // Leaves setup mode
-    else if (command == "done") {
+    if (command == "done") {
       try {
         chessController.setup_done();
       }
@@ -139,6 +137,13 @@ void ChessView::run() {
       catch (Error err) {
         cout << "Game error: " << err.get_msg() << endl;
       }     
+    }
+    if (command == "results") {
+      try {
+        board->notifyObservers("sr");
+      } catch (Error err) {
+        cout << "Game error: " << err.get_msg() << endl;
+      }
     }
   }
 }
