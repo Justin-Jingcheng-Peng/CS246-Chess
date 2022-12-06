@@ -23,7 +23,7 @@ bool Pawn::valid_move(ChessBoard* bo, Position pos1, Position pos2) {
   // Conditions for en passant
   int moved_dist_row = abs(recent_move.get_orig_pos().get_y_pos() - recent_move.get_final_pos().get_y_pos());
   int moved_dist_col = abs(recent_move.get_orig_pos().get_x_pos() - recent_move.get_final_pos().get_x_pos());
-  if (moved_piece->get_type() == 'p' && moved_dist_col == 0 && moved_dist_row == 2 && moved_piece->get_color() != this->get_color() && pos2.get_x_pos() == recent_move.get_final_pos().get_x_pos() && abs(pos2.get_final_pos().get_y_pos() - recent_move.get_final_pos().get_y_pos()) == 1 && dist_row == 1 && dist_col == 1) {return true;}
+  if (moved_piece->get_type() == 'p' && moved_dist_col == 0 && moved_dist_row == 2 && moved_piece->get_color() != this->get_color() && pos2.get_x_pos() == recent_move.get_final_pos().get_x_pos() && abs(pos2.get_y_pos() - recent_move.get_final_pos().get_y_pos()) == 1 && dist_row == 1 && dist_col == 1) {return true;}
   return false;
 }
 

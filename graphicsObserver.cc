@@ -77,8 +77,8 @@ void GraphicsObserver::notify(string gameResult) {
     Position orig = recentMove.get_orig_pos();
     Position final_pos = recentMove.get_final_pos();
 
-    int orig_x = from.get_x_pos();
-    int orig_y = from.get_y_pos();
+    int orig_x = orig.get_x_pos();
+    int orig_y = orig.get_y_pos();
     if ((orig_x % 2 == 0) && (orig_y % 2 == 0)) {
       // print white square
       window->fillRectangle(orig_x * 50 + 50, orig_y * 50, 50, 50, 8);
@@ -99,7 +99,7 @@ void GraphicsObserver::notify(string gameResult) {
     if (recentMove.get_enpassant()) {
       int move_unit = ((recentMove.get_piece())->get_color() == 'w') ? -1 : 1;
       int p_x = recentMove.get_final_pos().get_x_pos();
-      int p_y = recentMove.get_final_pos().get_y_pos();
+      int p_y = recentMove.get_final_pos().get_y_pos() - move_unit;
       if ((p_x + p_y) % 2 == 1) {
         window->fillRectangle(p_x * 50 + 50, p_y * 50, 50, 50, 9);
       } else {

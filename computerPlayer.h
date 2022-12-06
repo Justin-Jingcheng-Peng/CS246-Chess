@@ -1,6 +1,7 @@
 #ifndef COMPUTER_H
 #define COMPUTER_H
 
+#include "memory.h"
 #include <vector>
 
 using namespace std;

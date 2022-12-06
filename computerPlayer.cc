@@ -18,7 +18,7 @@ vector<vector<Position>> ComputerPlayer::get_moves(ChessBoard *chessBoard, char 
 
   for (int i = 0; i < 8; i++) {
     for (int j = 0; j < 8; j++) {
-      if (theBoard[i][j]->get_color() == color && theBoard[i][j] != nullptr) {
+      if (theBoard[i][j] != nullptr && theBoard[i][j]->get_color() == color) {
         for (int k = 0; k < 8; k++) {
           for (int l = 0; l < 8; l++) {
             if (theBoard[i][j]->valid_move(chessBoard, Position(j,i), Position(l,k))) {
@@ -31,7 +31,7 @@ vector<vector<Position>> ComputerPlayer::get_moves(ChessBoard *chessBoard, char 
               }
               
               if (!chessBoard->is_pos_in_check(kingPosition, chessBoard->get_turn())) {
-                moves.emplace_back(Position(j,i), Position(l,k));
+                moves.push_back({Position(j,i), Position(l,k)});
               }
 
               chessBoard->undo();
@@ -57,7 +57,7 @@ vector<vector<Position>> ComputerPlayer::get_attacking_moves(ChessBoard *chessBo
     int x = moves[i][1].get_x_pos();
     int y = moves[i][1].get_y_pos();
     
-    if (theBoard[x][y] != nullptr) {
+    if (theBoard[y][x] != nullptr) {
       attackingMoves.emplace_back(moves[i]);
     }
   }
@@ -109,8 +109,9 @@ vector<vector<Position>> ComputerPlayer::get_checkmate_moves(ChessBoard *chessBo
 
   int numOfMoves = moves.size();
   
-  string result = "e";
+  string result = "";
   result += chessBoard->get_turn();
+  result += "e";
 
   for (int i = 0; i < numOfMoves; i++) {
     chessBoard->move(moves[i][0], moves[i][1], true);
@@ -132,8 +133,8 @@ int ComputerPlayer::num_of_attackable_pieces(ChessBoard *chessBoard) {
     for (int j = 0; j < 0; j++) {
       if (theBoard[i][j] != nullptr && 
       (theBoard[i][j]->get_color() == chessBoard->get_turn()) && 
-      theBoard[i][j]->get_type() == 'K' &&
-      chessBoard->is_pos_in_check(Position(i,j), chessBoard->get_turn())) {
+      theBoard[i][j]->get_type() == 'k' &&
+      chessBoard->is_pos_in_check(Position(j,i), chessBoard->get_turn())) {
         num++;
       }
     }

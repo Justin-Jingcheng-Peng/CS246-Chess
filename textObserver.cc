@@ -17,7 +17,7 @@ TextObserver::~TextObserver() {
   chessBoard->detach(this);
 }
 
-TextObserver::notify(string gameResult) {
+void TextObserver::notify(string gameResult) {
   if (gameResult != "sr") {
     vector<vector<shared_ptr<Piece>>> board_arr = chessBoard->get_board();
     for (int i = 0; i < 8; ++i) {
@@ -27,7 +27,7 @@ TextObserver::notify(string gameResult) {
           else {cout << ' ';}
         }
         else{
-          cout << chessBoard[i][j]->get_symbol();
+          cout << board_arr[i][j]->get_symbol();
         }
       }
       cout << endl;
