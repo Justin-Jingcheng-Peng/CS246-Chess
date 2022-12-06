@@ -19,7 +19,7 @@ bool Pawn::valid_move(ChessBoard* bo, Position pos1, Position pos2) {
     return false;
   }
   Move recent_move = bo->get_last_move();
-  Piece* moved_piece = recent_move.get_moved_piece();
+  std::shared_ptr<Piece> moved_piece = recent_move.get_piece();
   // Conditions for en passant
   int moved_dist_row = abs(recent_move.get_orig_pos().get_y_pos() - recent_move.get_final_pos().get_y_pos());
   int moved_dist_col = abs(recent_move.get_orig_pos().get_x_pos() - recent_move.get_final_pos().get_x_pos());

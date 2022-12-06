@@ -2,6 +2,7 @@
 #define PAWN_H
 #include "piece.h"
 #include <cmath>
+#include <memory>
 
 class Pawn: public Piece {
   private:  
