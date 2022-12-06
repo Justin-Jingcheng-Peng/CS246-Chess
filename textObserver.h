@@ -1,6 +1,9 @@
 #ifndef TEXTOBSERVER_H
 #define TEXTOBSERVER_H
 #include "observer.h"
+#include <vector>
+#include <memory>
+#include <iostream>
 #include "chessBoard.h"
 
 using namespace string;
@@ -11,7 +14,7 @@ class TextObserver : public Observer {
   public:
     TextObserver(ChessBoard *chessBoard);
     ~TextObserver();
-    void notify(string gameResult);
+    void notify(string gameResult) override;
 };
 
 #endif

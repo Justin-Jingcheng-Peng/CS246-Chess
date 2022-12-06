@@ -3,6 +3,7 @@
 
 #include "position.h"
 #include <vector>
+#include <memory>
 
 class ChessBoard;
 class Piece

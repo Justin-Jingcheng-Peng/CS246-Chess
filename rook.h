@@ -2,7 +2,6 @@
 #define ROOK_H
 #include "piece.h"
 #include <cmath>
-#include <vector>
 
 class Rook: public Piece {
   private:  

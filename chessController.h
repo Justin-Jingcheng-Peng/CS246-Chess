@@ -11,14 +11,14 @@ class ChessController {
 
 public:
   ChessController(ChessBoard *chessBoard);
-  void start(string player1, string player2);
+  void start_game(string player1, string player2);
   void resign();
   void move(string move_commands);
   void undo();
   void setup();
-  void setup_addPiece(char piece, string position);
-  void setup_removePiece(string position);
-  void setup_setColorTurn(char color);
+  void setup_add_piece(char piece, string position);
+  void setup_remove_piece(string position);
+  void setup_set_turn(char color);
   void setup_done();
 };
 

@@ -1,6 +1,7 @@
 #ifndef SUBJECT_H
 #define SUBJECT_H
 #include <vector>
+#include <string>
 #include "observer.h"
 
 class Observer;
@@ -13,8 +14,7 @@ public:
   Subject();
   void attach(Observer *o);
   void detach(Observer *o);
-  void notifyObservers();
-  virtual char getState(int row, int col) const = 0;
+  void notifyObservers(std::string result);
   virtual ~Subject() = default;
 };
 

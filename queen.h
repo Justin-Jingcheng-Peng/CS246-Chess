@@ -2,7 +2,6 @@
 #define QUEEN_H
 #include "piece.h"
 #include <cmath>
-#include <vector>
 
 class Queen: public Piece {
   private:  

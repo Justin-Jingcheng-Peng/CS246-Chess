@@ -1,1173 +1,555 @@
 #include "chessBoard.h"
-#include "position.h"
-#include <string>
+#include <cmath>
 
-/*
-Black: lowercase
-White: uppercase
+using namespace std;
 
-king: k;
-root: r;
-bishop: b;
-queen: q;
-knight: n;
-pawn: p;
-*/
+ChessBoard::ChessBoard() {
+    score["White"] = 0;
+    score["Black"] = 0;
+    this->mode = "pre game";
+    this->make_empty_board();
+}
 
-// Chessboard Constructor, init the chessboard with the chess starting position
-ChessBoard::ChessBoard() : board(8, vector<Piece *>(8, 0))
-{
+ChessBoard::~ChessBoard() {
+    board.clear();
+}
 
-  this->round = 'w';
-  for (int r = 0; r < 8; r++)
-  {
-    for (int c = 0; c < 8; c++)
-    {
-      this->board[r][c] = nullptr;
+void ChessBoard::set_std_board() {
+    // add black pieces
+    this->setup_add_piece(make_shared<Rook>('r'), Position(0, 0));
+    this->setup_add_piece(make_shared<Knight>('n'), Position(1,0));
+    this->setup_add_piece(make_shared<Bishop>('b'), Position(2,0));
+    this->setup_add_piece(make_shared<Queen>('q'), Position(3,0));
+    this->setup_add_piece(make_shared<King>('k'), Position(4,0));
+    this->setup_add_piece(make_shared<Bishop>('b'), Position(5,0));
+    this->setup_add_piece(make_shared<Knight>('n'), Position(6,0));
+    this->setup_add_piece(make_shared<Rook>('r'), Position(7,0));
+    for (int i = 0; i < 8; ++i) {
+        this->setup_add_piece(make_shared<Pawn>('p'), Position(i,1));
     }
-  }
-  this->setNewPiece(0, 0, 'r');
-  this->setNewPiece(0, 1, 'n');
-  this->setNewPiece(0, 2, 'b');
-  this->setNewPiece(0, 3, 'q');
-  this->setNewPiece(0, 4, 'k');
-  this->setNewPiece(0, 5, 'b');
-  this->setNewPiece(0, 6, 'n');
-  this->setNewPiece(0, 7, 'r');
-
-  this->setNewPiece(1, 0, 'p');
-  this->setNewPiece(1, 1, 'p');
-  this->setNewPiece(1, 2, 'p');
-  this->setNewPiece(1, 3, 'p');
-  this->setNewPiece(1, 4, 'p');
-  this->setNewPiece(1, 5, 'p');
-  this->setNewPiece(1, 6, 'p');
-  this->setNewPiece(1, 7, 'p');
-
-  this->setNewPiece(6, 0, 'P');
-  this->setNewPiece(6, 1, 'P');
-  this->setNewPiece(6, 2, 'P');
-  this->setNewPiece(6, 3, 'P');
-  this->setNewPiece(6, 4, 'P');
-  this->setNewPiece(6, 5, 'P');
-  this->setNewPiece(6, 6, 'P');
-  this->setNewPiece(6, 7, 'P');
-
-  this->setNewPiece(7, 0, 'R');
-  this->setNewPiece(7, 1, 'N');
-  this->setNewPiece(7, 2, 'B');
-  this->setNewPiece(7, 3, 'Q');
-  this->setNewPiece(7, 4, 'K');
-  this->setNewPiece(7, 5, 'B');
-  this->setNewPiece(7, 6, 'N');
-  this->setNewPiece(7, 7, 'R');
-}
-// dtor
-ChessBoard::~ChessBoard()
-{
-  // dtor is is responsible for cleaning up the past history pointers and pointers in the current board 2D vector
-  for (int x = 0; x < 8; x++)
-  {
-    for (int y = 0; y < 8; y++)
-    {
-      delete this->board[x][y];
+    // add white pieces
+    this->setup_add_piece(make_shared<Rook>('R'), Position(0, 7));
+    this->setup_add_piece(make_shared<Knight>('N'), Position(1,7));
+    this->setup_add_piece(make_shared<Bishop>('B'), Position(2,7));
+    this->setup_add_piece(make_shared<Queen>('Q'), Position(3,7));
+    this->setup_add_piece(make_shared<King>('K'), Position(4,7));
+    this->setup_add_piece(make_shared<Bishop>('B'), Position(5,7));
+    this->setup_add_piece(make_shared<Knight>('N'), Position(6,7));
+    this->setup_add_piece(make_shared<Rook>('R'), Position(7,7));
+    for (int i = 0; i < 8; ++i){
+        this->setup_add_piece(make_shared<Pawn>('P'), Position(i,6));
     }
-  }
-  // clean up the history.
-  while (this->pastMoves.size() > 0)
-  {
-    Move temp = this->pastMoves.back();
-    delete temp.removed_piece;
-    this->pastMoves.pop_back();
-  }
 }
-// Get a copy of the piece ptr;
-Piece *ChessBoard::getPieceAt(int x, int y)
-{
-  return this->board[x][y];
-}
-// Get the copy of the 2D vector
-std::vector<std::vector<Piece *>> ChessBoard::get_board()
-{
-  return this->board;
-}
-// get a copy of the last move
-Move ChessBoard::get_last_move()
-{
-  return pastMoves.back();
-}
-// Given a position, return true if this position is within the chessboard bound, false otherwise
-bool ChessBoard::isInBound(Position p1)
-{
-  if (p1.get_x_pos() >= 0 && p1.get_x_pos() <= 7)
-  {
-    if (p1.get_y_pos() >= 0 && p1.get_y_pos() <= 7)
-    {
-      return true;
+
+bool ChessBoard::is_empty_board() {
+    for (int i = 0; i < 8; ++i) {
+        for (int j = 0; j < 8; ++j) {
+            if(board[i][j] != nullptr) {return false;}
+        }
     }
-  }
-  return false;
+    return true;
 }
-// Given a position, return true if this position is both in bound and this position has a piece (non empty).
-bool ChessBoard::isInBoundAndNonNull(Position p1)
-{
-  return (this->isInBound(p1) && this->board[p1.get_x_pos()][p1.get_y_pos()] != nullptr);
-}
-// Take two postions. Do a normal move. There are two types. 1) Move from one Position to another empty cell. 2) Move from one Position to eat the opponent's piece.
-void ChessBoard::standardMove(Position initPos, Position finalPos)
-{
-  this->move(initPos, finalPos, false);
-}
-// This is an internal function that has a lot of logic in it. Thus this is private.
-void ChessBoard::move(Position initPos, Position finalPos, bool is_castling)
-{
-  const int init_row = initPos.get_x_pos();
-  const int init_col = initPos.get_y_pos();
-  const int fin_row = finalPos.get_x_pos();
-  const int fin_col = finalPos.get_y_pos();
-  // Validility check
-  // Check if the starting postion is null(empty);
 
-  if (this->board[init_row][init_col] == nullptr)
-
-  {
-    cout << "Invalid move. There is no Piece in this position" << endl;
-    return;
-  }
-  // Check boundary;
-  if (isInBound(initPos) == false || isInBound(finalPos) == false)
-  {
-    cout << "Invalid move! This move is out of the bound!" << endl;
-    return;
-  }
-  // // Check if white eats white or black eats black;
-
-  if (this->board[fin_row][fin_col] != nullptr)
-  {
-    if ((this->board[fin_row][fin_col]->get_color() == 'w' && this->board[init_row][init_col]->get_color() == 'w') || (this->board[fin_row][fin_col]->get_color() == 'b' && this->board[init_row][init_col]->get_color() == 'b'))
-    {
-      cout << "Invalid move! This makes one color to eat the same color" << endl;
-      return;
+void ChessBoard::make_empty_board() {
+    bool make_board = true;
+    for (int i = 0; i < 8; ++i) {
+        vector<shared_ptr<Piece>> row;
+        for (int j = 0; j < 8; ++j) {
+            row.emplace_back(nullptr);
+            if (!make_board) {board[i][j] = nullptr;}
+        }
+        if (make_board) {board.emplace_back(row);}
     }
-  }
-  // Color check;
-  if ((this->round == 'b' && this->board[init_row][init_col]->get_color() == 'w') || (this->round == 'w' && this->board[init_row][init_col]->get_color() == 'b'))
-  {
-    cout << "Invalid move! Wrong color!" << endl;
-    return;
-  }
-
-  // The case that no pieces are eaten, do a simple move
-  if (this->board[fin_row][fin_col] == nullptr)
-  {
-    Piece *temp = this->board[init_row][init_col];
-    this->board[init_row][init_col] = nullptr;
-    this->board[fin_row][fin_col] = temp;
-    if (is_castling == false)
-    {
-      this->pastMoves.push_back(Move{nullptr, Position{init_row, init_col}, Position{fin_row, fin_col}, false, false, false});
-    }
-    else
-    {
-      this->pastMoves.push_back(Move{nullptr, Position{init_row, init_col}, Position{fin_row, fin_col}, true, false, false});
-    }
-  }
-  // The case that the final position has a piece from the opponent, we delete the opponent and move it there
-  else
-  {
-
-    if ((this->board[fin_row][fin_col]->get_color() == 'w' && this->board[init_row][init_col]->get_color() == 'b') || (this->board[fin_row][fin_col]->get_color() == 'b' && this->board[init_row][init_col]->get_color() == 'w'))
-    {
-
-      Piece *removedPiece = this->board[fin_row][fin_col];
-      Piece *temp = this->board[init_row][init_col];
-      this->board[init_row][init_col] = nullptr;
-      this->board[fin_row][fin_col] = temp;
-
-      this->pastMoves.push_back(Move{removedPiece, Position{init_row, init_col}, Position{fin_row, fin_col}, false, false, false});
-    }
-    else
-    {
-      cout << "Invalid Move! This move is out of the bound!" << endl;
-      return;
-    }
-  }
-  if (this->round == 'b')
-  {
-    this->round = 'w';
-  }
-  else
-  {
-    this->round = 'b';
-  }
 }
-// Taking a direction and the color, move the castling. Note: This function is very weak so make sure that the current board meet the castling critiria before you preceed.
-void ChessBoard::castlingMove(char direction, char color)
-{
 
-  if (direction == 'l' && color == 'w')
-  {
-    // We split a castling into two moves. In pastMoves vector, we mark the second movement as the end of this "move" combination;
-    this->move(Position{7, 4}, Position{7, 2}, false);
-    this->round = 'w';
-    this->move(Position{7, 0}, Position{7, 3}, true);
-  }
-  else if (direction == 'r' && color == 'w')
-  {
-    this->move(Position{7, 4}, Position{7, 6}, false);
-    this->round = 'w';
-    this->move(Position{7, 7}, Position{7, 5}, true);
-  }
-  else if (direction == 'l' && color == 'b')
-  {
-    this->move(Position{0, 4}, Position{0, 2}, false);
-    this->round = 'b';
-    this->move(Position{0, 0}, Position{0, 3}, true);
-  }
-  else if (direction == 'r' && color == 'b')
-  {
-    this->move(Position{0, 4}, Position{0, 6}, false);
-    this->round = 'b';
-    this->move(Position{0, 7}, Position{0, 5}, true);
-  }
-}
-// Take three positions: Initial position, final position, and the position of the eaten piece. Process an enpassant move.
-void ChessBoard::enpassantMove(Position initPos, Position finalPos, Position eatenPiecePosition)
-{
-  const int init_row = initPos.get_x_pos();
-  const int init_col = initPos.get_y_pos();
-  const int fin_row = finalPos.get_x_pos();
-  const int fin_col = finalPos.get_y_pos();
-  // First move the pawn from the init_postion to the final, no pieces got eaten
-  Piece *temp = this->board[init_row][init_col];
-  this->board[init_row][init_col] = nullptr;
-  this->board[fin_row][fin_col] = temp;
-  this->pastMoves.push_back(Move{nullptr, Position{init_row, init_col}, Position{fin_row, fin_col}, false, false, false});
-  // Then the piece got eaten
-  temp = this->board[eatenPiecePosition.x][eatenPiecePosition.y];
-  this->board[eatenPiecePosition.x][eatenPiecePosition.y] = nullptr;
-  this->pastMoves.push_back(Move{temp, Position{eatenPiecePosition.x, eatenPiecePosition.y}, Position{eatenPiecePosition.x, eatenPiecePosition.y}, false, true, false});
-  if (this->round == 'b')
-  {
-    this->round = 'w';
-  }
-  else
-  {
-    this->round = 'b';
-  }
-}
-// Brute force implementation, find all possible ways the black king can be checked.
-void ChessBoard::promotionMove(Position initPos, Position finalPos, char pieceTurnedTo)
-{
-  delete this->board[initPos.x][initPos.y];
-  Piece *temp = this->board[finalPos.x][finalPos.y];
-  this->setNewPiece(finalPos.x, finalPos.y, pieceTurnedTo);
-  this->board[initPos.x][initPos.y] = nullptr;
-  this->pastMoves.push_back(Move{temp, initPos, finalPos, false, false, true});
-  if (this->round == 'b')
-  {
-    this->round = 'w';
-  }
-  else
-  {
-    this->round = 'b';
-  }
-}
-bool ChessBoard::isBlackBeingChecked()
-{
-
-  for (int x = 0; x < 8; x++)
-  {
-    for (int y = 0; y < 8; y++)
-    {
-      // find the black king
-      if (this->board[x][y] != nullptr && this->board[x][y]->get_symbol() == 'k')
-      {
-
-        // check pawn capture;
-        if ((isInBoundAndNonNull(Position{x + 1, y - 1}) && this->board[x + 1][y - 1]->get_symbol() == 'P') || (isInBoundAndNonNull(Position{x + 1, y + 1}) && this->board[x + 1][y + 1]->get_symbol() == 'P'))
-        {
-          return true;
-        }
-        // check the knight capture;
-        if ((isInBoundAndNonNull(Position{x - 2, y - 1}) && this->board[x - 2][y - 1]->get_symbol() == 'N') || (isInBoundAndNonNull(Position{x - 1, y - 2}) && this->board[x - 1][y - 2]->get_symbol() == 'N') || (isInBoundAndNonNull(Position{x + 1, y - 2}) && this->board[x + 1][y - 2]->get_symbol() == 'N') || (isInBoundAndNonNull(Position{x + 2, y - 1}) && this->board[x + 2][y - 1]->get_symbol() == 'N') || (isInBoundAndNonNull(Position{x + 2, y + 1}) && this->board[x + 2][y + 1]->get_symbol() == 'N') || (isInBoundAndNonNull(Position{x + 1, y + 2}) && this->board[x + 1][y + 2]->get_symbol() == 'N') || (isInBoundAndNonNull(Position{x - 2, y + 1}) && this->board[x - 2][y + 1]->get_symbol() == 'N') || (isInBoundAndNonNull(Position{x - 1, y + 2}) && this->board[x - 1][y + 2]->get_symbol() == 'N'))
-        {
-          return true;
-        }
-        // check the bishop;
-        Position p1{x, y};
-        while (isInBound(p1))
-        {
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()] == nullptr || this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'k')
-          {
-            p1.x++;
-            p1.y++;
-            continue;
-          }
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'B')
-          {
-            return true;
-          }
-          else
-          {
-            break;
-          }
-        }
-        p1.x = x;
-        p1.y = y;
-        while (isInBound(p1))
-        {
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()] == nullptr || this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'k')
-          {
-            p1.x++;
-            p1.y--;
-            continue;
-          }
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'B')
-          {
-            return true;
-          }
-
-          else
-          {
-            break;
-          }
-        }
-        p1.x = x;
-        p1.y = y;
-        while (isInBound(p1))
-        {
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()] == nullptr || this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'k')
-          {
-            p1.x--;
-            p1.y++;
-            continue;
-          }
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'B')
-          {
-            return true;
-          }
-          else
-          {
-            break;
-          }
-        }
-        p1.x = x;
-        p1.y = y;
-        while (isInBound(p1))
-
-        {
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()] == nullptr || this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'k')
-          {
-            p1.x--;
-            p1.y--;
-            continue;
-          }
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'B')
-          {
-            return true;
-          }
-          else
-          {
-            break;
-          }
-        }
-        // Check Queen capturing:
-        p1.x = x;
-        p1.y = y;
-        while (isInBound(p1))
-        {
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()] == nullptr || this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'k')
-          {
-            p1.x++;
-            p1.y++;
-            continue;
-          }
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'Q')
-          {
-            return true;
-          }
-          else
-          {
-            break;
-          }
-        }
-        p1.x = x;
-        p1.y = y;
-        while (isInBound(p1))
-        {
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()] == nullptr || this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'k')
-          {
-            p1.x++;
-            p1.y--;
-            continue;
-          }
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'Q')
-          {
-            return true;
-          }
-
-          else
-          {
-            break;
-          }
-        }
-        p1.x = x;
-        p1.y = y;
-        while (isInBound(p1))
-        {
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()] == nullptr || this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'k')
-          {
-            p1.x--;
-            p1.y++;
-            continue;
-          }
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'Q')
-          {
-            return true;
-          }
-          else
-          {
-            break;
-          }
-        }
-        p1.x = x;
-        p1.y = y;
-        while (isInBound(p1))
-        {
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()] == nullptr || this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'k')
-          {
-            p1.x--;
-            p1.y--;
-            continue;
-          }
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'Q')
-          {
-            return true;
-          }
-          else
-          {
-            break;
-          }
-        }
-        p1.x = x;
-        p1.y = y;
-        while (isInBound(p1))
-        {
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()] == nullptr || this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'k')
-          {
-            p1.x--;
-            continue;
-          }
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'Q')
-          {
-            return true;
-          }
-          else
-          {
-            break;
-          }
-        }
-        p1.x = x;
-        p1.y = y;
-        while (isInBound(p1))
-        {
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()] == nullptr || this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'k')
-          {
-            p1.x++;
-            continue;
-          }
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'Q')
-          {
-            return true;
-          }
-          else
-          {
-            break;
-          }
-        }
-        p1.x = x;
-        p1.y = y;
-        while (isInBound(p1))
-        {
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()] == nullptr || this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'k')
-          {
-            p1.y--;
-            continue;
-          }
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'Q')
-          {
-            return true;
-          }
-          else
-          {
-            break;
-          }
-        }
-        p1.x = x;
-        p1.y = y;
-        while (isInBound(p1))
-        {
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()] == nullptr || this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'k')
-          {
-            p1.y++;
-            continue;
-          }
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'Q')
-          {
-            return true;
-          }
-          else
-          {
-            break;
-          }
-        }
-
-        // Check rook capture;
-        p1.x = x;
-        p1.y = y;
-        while (isInBound(p1))
-        {
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()] == nullptr || this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'k')
-          {
-            p1.x--;
-            continue;
-          }
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'R')
-          {
-            return true;
-          }
-          else
-          {
-            break;
-          }
-        }
-        p1.x = x;
-        p1.y = y;
-        while (isInBound(p1))
-        {
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()] == nullptr || this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'k')
-          {
-            p1.x++;
-            continue;
-          }
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'R')
-          {
-            return true;
-          }
-          else
-          {
-            break;
-          }
-        }
-        p1.x = x;
-        p1.y = y;
-        while (isInBound(p1))
-        {
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()] == nullptr || this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'k')
-          {
-            p1.y--;
-            continue;
-          }
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'R')
-          {
-            return true;
-          }
-          else
-          {
-            break;
-          }
-        }
-        p1.x = x;
-        p1.y = y;
-        while (isInBound(p1))
-        {
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()] == nullptr || this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'k')
-          {
-            p1.y++;
-            continue;
-          }
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'R')
-          {
-            return true;
-          }
-          else
-          {
-            break;
-          }
-        }
-      }
+void ChessBoard::move_king(Position pos1, Position pos2) {
+    if (!board[pos1.get_y_pos()][pos1.get_x_pos()]->valid_move(this, pos1, pos2)) {
+        throw Error{"Invalid King or Castling move."};
     }
-  }
-  return false;
+    int dist_row = abs(pos1.get_y_pos() - pos2.get_x_pos());
+    int dist_col = abs(pos1.get_x_pos() - pos2.get_x_pos());
+    if (dist_row == 1 && dist_col == 0) {
+        pastMoves.emplace_back(board[pos1.get_y_pos()][pos1.get_x_pos()], board[pos2.get_y_pos()][pos2.get_x_pos()], pos1, pos2, false, false, false);
+        board[pos2.get_y_pos()][pos2.get_x_pos()] = board[pos1.get_y_pos()][pos1.get_x_pos()];
+        board[pos1.get_y_pos()][pos1.get_x_pos()]->add_move_count();
+        board[pos1.get_y_pos()][pos1.get_x_pos()] = nullptr;
+    }
+    else if (dist_row == 0 && dist_col == 1) {
+        pastMoves.emplace_back(board[pos1.get_y_pos()][pos1.get_x_pos()], board[pos2.get_y_pos()][pos2.get_x_pos()], pos1, pos2, false, false, false);
+        board[pos2.get_y_pos()][pos2.get_x_pos()] = board[pos1.get_y_pos()][pos1.get_x_pos()];
+        board[pos1.get_y_pos()][pos1.get_x_pos()]->add_move_count();
+        board[pos1.get_y_pos()][pos1.get_x_pos()] = nullptr;
+    }
+    else if (dist_row == dist_col) {
+        pastMoves.emplace_back(board[pos1.get_y_pos()][pos1.get_x_pos()], board[pos2.get_y_pos()][pos2.get_x_pos()], pos1, pos2, false, false, false);
+        board[pos2.get_y_pos()][pos2.get_x_pos()] = board[pos1.get_y_pos()][pos1.get_x_pos()];
+        board[pos1.get_y_pos()][pos1.get_x_pos()]->add_move_count();
+        board[pos1.get_y_pos()][pos1.get_x_pos()] = nullptr;
+    }
+    // Castling
+    else if (pos2.get_x_pos() == 6 && pos2.get_y_pos() == 7) {
+        castling_move(Position(4,7), Position(6,7), Position(7,7), Position(5,7));
+    }
+    else if (pos2.get_x_pos() == 2 && pos2.get_y_pos() == 7) {
+        castling_move(Position(4,7), Position(2,7), Position(0,7), Position(3,7));
+    }
+    else if (pos2.get_x_pos() == 6 && pos2.get_y_pos() == 0) {
+        castling_move(Position(4,0), Position(6,0), Position(7,0), Position(5,0));
+    }
+    else if (pos2.get_x_pos() == 2 && pos2.get_y_pos() == 0) {
+        castling_move(Position(4,0), Position(2,0), Position(0,0), Position(3,0));
+    }
 }
-// This function is not tested at all since this function rely on the implementation of pieces' method
-bool ChessBoard::isBlackLost()
-{
-  // The game does not allow direct capture of King
-  if (this->round == 'w')
-  {
-    return false;
-  }
 
-  /*
-  Approach: When the black is in check and black has no legal moving postion.
-  */
-  int count = 0;
-  if (this->isBlackBeingChecked() == true)
-  {
-    for (int x = 0; x < 8; x++)
-    {
-      for (int y = 0; y < 8; y++)
-      {
-        if (this->board[x][y] != nullptr && this->board[x][y]->get_symbol() == 'K')
-        {
-          for (int i = 0; i < 8; i++)
-          {
-            for (int j = 0; j < 8; j++)
-            {
-              Position curPos = Position{x, y};
-              Position targetPos = Position{i, j};
-              if (this->board[x][y]->valid_move(this, curPos, targetPos))
-              {
-                count++;
-              }
+bool ChessBoard::is_pos_in_check(Position pos, char colour) {
+    // imagine it being filled with a piece.
+    shared_ptr<Piece> temp = board[pos.get_y_pos()][pos.get_x_pos()];
+    char queen = (colour == 'w' ? 'Q' : 'q');
+    board[pos.get_y_pos()][pos.get_x_pos()] = make_shared<Queen>(queen);
+    for (int i = 0; i < 8; ++i) {
+        for (int j = 0; j < 8; ++j) {
+            if ((board[i][j] == nullptr) || (board[i][j]->get_color() == colour)) {continue;}
+            if (board[i][j]->valid_move(this, Position(j,i), pos)) {
+                board[pos.get_y_pos()][pos.get_x_pos()] = temp;
+                return true;
             }
-          }
         }
-      }
     }
-    // (count == 0) implies that there is no legal moves;
-    if (count == 0)
-    {
-      return true;
-    }
-    else
-    {
-      return false;
-    }
-  }
-  // If black is not checked, it means black is not losing.
-  else
-  {
-    return false;
-  }
-}
-// This function is not tested at all since this function rely on the implementation of pieces' method
-bool ChessBoard::isWhiteLost()
-{
-  // The game does not allow direct capture of King
-  if (this->round == 'b')
-  {
-    return false;
-  }
 
-  /*
-  Approach: When the black is in check and black has no legal moving postion.
-  */
-  int count = 0;
-  if (this->isBlackBeingChecked() == true)
-  {
-    for (int x = 0; x < 8; x++)
-    {
-      for (int y = 0; y < 8; y++)
-      {
-        if (this->board[x][y] != nullptr && this->board[x][y]->get_symbol() == 'k')
-        {
-          for (int i = 0; i < 8; i++)
-          {
-            for (int j = 0; j < 8; j++)
-            {
-              Position curPos = Position{x, y};
-              Position targetPos = Position{i, j};
-              if (this->board[x][y]->valid_move(this, curPos, targetPos))
-              {
-                count++;
-              }
+    board[pos.get_y_pos()][pos.get_x_pos()] = temp;
+    return false;
+}
+
+bool ChessBoard::is_white_checked() {return is_pos_in_check(get_piece_pos('K'), 'w');}
+
+bool ChessBoard::is_black_checked() {return is_pos_in_check(get_piece_pos('k'), 'b');}
+
+bool ChessBoard::can_white_king_move(Position white_king_pos) {
+    for (int i = 0; i < 8; ++i) {
+        for (int j = 0; j < 8; ++j) {
+            if ((i != white_king_pos.get_y_pos() || j != white_king_pos.get_x_pos()) && board[white_king_pos.get_y_pos()][white_king_pos.get_x_pos()]->valid_move(this, white_king_pos, Position(j,i))) {
+                return true;
             }
-          }
         }
-      }
-    }
-    // (count == 0) implies that there is no legal moves;
-    if (count == 0)
-    {
-      return true;
-    }
-    else
-    {
-      return false;
-    }
-  }
-  // If black is not checked, it means black is not losing.
-  else
-  {
+    } 
     return false;
-  }
 }
-// Brute force implementation, find all possible ways the black king can be checked.
-bool ChessBoard::isWhiteBeingChecked()
-{
 
-  for (int x = 0; x < 8; x++)
-  {
-    for (int y = 0; y < 8; y++)
-    {
-      // find the white king
-      if (this->board[x][y] != nullptr && this->board[x][y]->get_symbol() == 'K')
-      {
+bool ChessBoard::can_black_king_move(Position black_king_pos) {
+    for (int i = 0; i < 8; ++i) {
+        for (int j = 0; j < 8; ++j) {
+            if ((i != black_king_pos.get_y_pos() || j != black_king_pos.get_x_pos()) && board[black_king_pos.get_y_pos()][black_king_pos.get_x_pos()]->valid_move(this, black_king_pos, Position(j,i))) {
+                return true;
+            }
+        }
+    } 
+    return false;
+}
 
-        // check pawn capture;
-        if ((isInBoundAndNonNull(Position{x - 1, y - 1}) && this->board[x - 1][y - 1]->get_symbol() == 'p') || (isInBoundAndNonNull(Position{x - 1, y + 1}) && this->board[x - 1][y + 1]->get_symbol() == 'p'))
-        {
-          return true;
-        }
-        // check the knight capture;
-        if ((isInBoundAndNonNull(Position{x - 2, y - 1}) && this->board[x - 2][y - 1]->get_symbol() == 'n') || (isInBoundAndNonNull(Position{x - 1, y - 2}) && this->board[x - 1][y - 2]->get_symbol() == 'n') || (isInBoundAndNonNull(Position{x + 1, y - 2}) && this->board[x + 1][y - 2]->get_symbol() == 'n') || (isInBoundAndNonNull(Position{x + 2, y - 1}) && this->board[x + 2][y - 1]->get_symbol() == 'n') || (isInBoundAndNonNull(Position{x + 2, y + 1}) && this->board[x + 2][y + 1]->get_symbol() == 'n') || (isInBoundAndNonNull(Position{x + 1, y + 2}) && this->board[x + 1][y + 2]->get_symbol() == 'n') || (isInBoundAndNonNull(Position{x - 2, y + 1}) && this->board[x - 2][y + 1]->get_symbol() == 'n') || (isInBoundAndNonNull(Position{x - 1, y + 2}) && this->board[x - 1][y + 2]->get_symbol() == 'n'))
-        {
-          return true;
-        }
-        // check the bishop;
-        Position p1{x, y};
-        while (isInBound(p1))
-        {
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()] == nullptr || this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'K')
-          {
-            p1.x++;
-            p1.y++;
-            continue;
-          }
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'b')
-          {
-            return true;
-          }
-          else
-          {
-            break;
-          }
-        }
-        p1.x = x;
-        p1.y = y;
-        while (isInBound(p1))
-        {
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()] == nullptr || this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'K')
-          {
-            p1.x++;
-            p1.y--;
-            continue;
-          }
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'b')
-          {
-            return true;
-          }
+void ChessBoard::castling_move(Position king_pos_1, Position king_pos_2, Position rook_pos_1, Position rook_pos_2) {
+    pastMoves.emplace_back(board[king_pos_1.get_y_pos()][king_pos_1.get_x_pos()], nullptr, king_pos_1, king_pos_2, true, false, false);
+    board[king_pos_2.get_y_pos()][king_pos_2.get_x_pos()] = board[king_pos_1.get_y_pos()][king_pos_1.get_x_pos()];
+    board[king_pos_2.get_y_pos()][king_pos_2.get_x_pos()]->add_move_count();
+    board[rook_pos_2.get_y_pos()][rook_pos_2.get_x_pos()] = board[rook_pos_1.get_y_pos()][rook_pos_1.get_x_pos()];
+    board[rook_pos_2.get_y_pos()][rook_pos_2.get_x_pos()]->add_move_count();
+    board[king_pos_1.get_y_pos()][king_pos_1.get_x_pos()] = nullptr;
+    board[rook_pos_1.get_y_pos()][rook_pos_1.get_x_pos()] = nullptr;
+}
 
-          else
-          {
-            break;
-          }
-        }
-        p1.x = x;
-        p1.y = y;
-        while (isInBound(p1))
-        {
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()] == nullptr || this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'K')
-          {
-            p1.x--;
-            p1.y++;
-            continue;
-          }
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'b')
-          {
-            return true;
-          }
-          else
-          {
-            break;
-          }
-        }
-        p1.x = x;
-        p1.y = y;
-        while (isInBound(p1))
-
-        {
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()] == nullptr || this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'K')
-          {
-            p1.x--;
-            p1.y--;
-            continue;
-          }
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'b')
-          {
-            return true;
-          }
-          else
-          {
-            break;
-          }
-        }
-        // Check Queen capturing:
-        p1.x = x;
-        p1.y = y;
-        while (isInBound(p1))
-        {
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()] == nullptr || this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'K')
-          {
-            p1.x++;
-            p1.y++;
-            continue;
-          }
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'q')
-          {
-            return true;
-          }
-          else
-          {
-            break;
-          }
-        }
-        p1.x = x;
-        p1.y = y;
-        while (isInBound(p1))
-        {
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()] == nullptr || this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'K')
-          {
-            p1.x++;
-            p1.y--;
-            continue;
-          }
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'q')
-          {
-            return true;
-          }
-
-          else
-          {
-            break;
-          }
-        }
-        p1.x = x;
-        p1.y = y;
-        while (isInBound(p1))
-        {
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()] == nullptr || this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'K')
-          {
-            p1.x--;
-            p1.y++;
-            continue;
-          }
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'q')
-          {
-            return true;
-          }
-          else
-          {
-            break;
-          }
-        }
-        p1.x = x;
-        p1.y = y;
-        while (isInBound(p1))
-        {
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()] == nullptr || this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'K')
-          {
-            p1.x--;
-            p1.y--;
-            continue;
-          }
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'q')
-          {
-            return true;
-          }
-          else
-          {
-            break;
-          }
-        }
-        p1.x = x;
-        p1.y = y;
-        while (isInBound(p1))
-        {
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()] == nullptr || this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'K')
-          {
-            p1.x--;
-            continue;
-          }
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'q')
-          {
-            return true;
-          }
-          else
-          {
-            break;
-          }
-        }
-        p1.x = x;
-        p1.y = y;
-        while (isInBound(p1))
-        {
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()] == nullptr || this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'K')
-          {
-            p1.x++;
-            continue;
-          }
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'q')
-          {
-            return true;
-          }
-          else
-          {
-            break;
-          }
-        }
-        p1.x = x;
-        p1.y = y;
-        while (isInBound(p1))
-        {
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()] == nullptr || this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'K')
-          {
-            p1.y--;
-            continue;
-          }
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'q')
-          {
-            return true;
-          }
-          else
-          {
-            break;
-          }
-        }
-        p1.x = x;
-        p1.y = y;
-        while (isInBound(p1))
-        {
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()] == nullptr || this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'K')
-          {
-            p1.y++;
-            continue;
-          }
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'q')
-          {
-            return true;
-          }
-          else
-          {
-            break;
-          }
-        }
-
-        // Check rook capture;
-        p1.x = x;
-        p1.y = y;
-        while (isInBound(p1))
-        {
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()] == nullptr || this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'K')
-          {
-            p1.x--;
-            continue;
-          }
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'r')
-          {
-            return true;
-          }
-          else
-          {
-            break;
-          }
-        }
-        p1.x = x;
-        p1.y = y;
-        while (isInBound(p1))
-        {
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()] == nullptr || this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'K')
-          {
-            p1.x++;
-            continue;
-          }
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'r')
-          {
-            return true;
-          }
-          else
-          {
-            break;
-          }
-        }
-        p1.x = x;
-        p1.y = y;
-        while (isInBound(p1))
-        {
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()] == nullptr || this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'K')
-          {
-            p1.y--;
-            continue;
-          }
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'r')
-          {
-            return true;
-          }
-          else
-          {
-            break;
-          }
-        }
-        p1.x = x;
-        p1.y = y;
-        while (isInBound(p1))
-        {
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()] == nullptr || this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'K')
-          {
-            p1.y++;
-            continue;
-          }
-          if (this->board[p1.get_x_pos()][p1.get_y_pos()]->get_symbol() == 'r')
-          {
-            return true;
-          }
-          else
-          {
-            break;
-          }
-        }
-      }
+void ChessBoard::move_pawn(Position pos1, Position pos2) {
+    if (!board[pos1.get_y_pos()][pos1.get_x_pos()]->valid_move(this, pos1, pos2)) {
+        throw Error{"Invalid pawn move."};
     }
-  }
-  return false;
+    // En passant
+    if (pos2.get_x_pos() != pos1.get_x_pos() && board[pos2.get_y_pos()][pos2.get_x_pos()] == nullptr) {
+        Move recent_move = this->get_last_move();
+        pastMoves.emplace_back(board[pos1.get_y_pos()][pos1.get_x_pos()], board[pos2.get_y_pos()][pos2.get_x_pos()], pos1, pos2, false, true, false);
+        board[pos2.get_y_pos()][pos2.get_x_pos()] = board[pos1.get_y_pos()][pos1.get_x_pos()];
+        board[pos1.get_y_pos()][pos1.get_x_pos()]->add_move_count();
+        board[pos1.get_y_pos()][pos1.get_x_pos()] = nullptr;
+        board[recent_move.get_final_pos().get_y_pos()][recent_move.get_final_pos().get_x_pos()] = nullptr;
+    }
+    else {
+        pastMoves.emplace_back(board[pos1.get_y_pos()][pos1.get_x_pos()], board[pos2.get_y_pos()][pos2.get_x_pos()], pos1, pos2, false, false, false);
+        board[pos2.get_y_pos()][pos2.get_x_pos()] = board[pos1.get_y_pos()][pos1.get_x_pos()];
+        board[pos1.get_y_pos()][pos1.get_x_pos()]->add_move_count();
+        board[pos1.get_y_pos()][pos1.get_x_pos()] = nullptr;
+    }
+
+    // Promotion
+    if ((board[pos2.get_y_pos()][pos2.get_x_pos()]->get_color() == 'w' && pos2.get_y_pos() == 0) || (board[pos2.get_y_pos()][pos2.get_x_pos()]->get_color() == 'b' && pos2.get_y_pos() == 7)) {
+        if (board[pos2.get_y_pos()][pos2.get_x_pos()]->get_color() == 'w') {
+            board[pos2.get_y_pos()][pos2.get_x_pos()] = make_shared<Queen>('Q');
+            board[pos2.get_y_pos()][pos2.get_x_pos()]->add_move_count();
+        }
+        else {
+            board[pos2.get_y_pos()][pos2.get_x_pos()] = make_shared<Queen>('q');
+            board[pos2.get_y_pos()][pos2.get_x_pos()]->add_move_count();
+        }
+        pastMoves.back().set_promotion(true);
+    }
 }
-// When either play lost, the game is finished;
-bool ChessBoard::isGameFinish()
-{
-  return (this->isBlackLost() || this->isWhiteLost());
+
+void ChessBoard::move_promote(Position pos1, Position pos2, char promote) {
+    if (board[pos1.get_y_pos()][pos1.get_x_pos()]->get_type() != 'p') {
+        throw Error{"The piece at the given position is not a pawn."};
+    }
+    if (promote != 'r' && promote != 'R' && promote != 'B' && promote != 'b' && promote != 'N' && promote != 'n' && promote != 'Q' && promote != 'q') {
+        throw Error{"You can only promote the pawn to either a bishop, rook, knight or queen."};
+    }
+    if (board[pos1.get_y_pos()][pos1.get_x_pos()]->valid_move(this, pos1, pos2) && ((board[pos1.get_y_pos()][pos1.get_x_pos()]->get_color() == 'w' && pos2.get_y_pos() == 0) || (board[pos1.get_y_pos()][pos1.get_x_pos()]->get_color() == 'b' && pos2.get_y_pos() == 7))) {
+        promote_pawn(pos1, pos2, promote);
+    } else {
+        throw Error{"Invalid promotion."};
+    }
+    check_turn_switch();
 }
-// Undo the moves
-void ChessBoard::undo()
-{
-  Move prevMove = this->pastMoves.back();
-  this->pastMoves.pop_back();
-  this->board[prevMove.original_pos.x][prevMove.original_pos.y] = this->board[prevMove.final_pos.x][prevMove.final_pos.y];
-  this->board[prevMove.final_pos.x][prevMove.final_pos.y] = prevMove.removed_piece;
-  if (prevMove.is_castling == true)
-  {
+
+void ChessBoard::promote_pawn(Position pos1, Position pos2, char promoted_to) {
+    char colour = (promoted_to < 'a' ? 'w' : 'b');
+    if (colour != board[pos1.get_y_pos()][pos1.get_x_pos()]->get_color()) {
+        throw Error{"The colour of the promoted piece and the original piece do not match."};
+    }
+    pastMoves.emplace_back(board[pos1.get_y_pos()][pos1.get_x_pos()], board[pos2.get_y_pos()][pos2.get_x_pos()], pos1, pos2, false, false, true);
+    board[pos1.get_y_pos()][pos1.get_x_pos()] = nullptr;
+    if (promoted_to == 'N' || promoted_to == 'n') {
+        board[pos2.get_y_pos()][pos2.get_x_pos()] = make_shared<Knight>(promoted_to);
+    } else if (promoted_to == 'B' || promoted_to == 'b') {
+        board[pos2.get_y_pos()][pos2.get_x_pos()] = make_shared<Bishop>(promoted_to);
+    } else if (promoted_to == 'R' || promoted_to == 'r') {
+        board[pos2.get_y_pos()][pos2.get_x_pos()] = make_shared<Rook>(promoted_to);
+    } else {
+        board[pos2.get_y_pos()][pos2.get_x_pos()] = make_shared<Queen>(promoted_to);
+    }
+    board[pos2.get_y_pos()][pos2.get_x_pos()]->add_move_count();
+}
+
+bool ChessBoard::can_piece_block(Position pos) {
+    if (board[pos.get_y_pos()][pos.get_x_pos()]->get_type() == 'n') {
+        if (is_pos_in_check(pos, board[pos.get_y_pos()][pos.get_x_pos()]->get_color())) {
+            return true;
+        } else {return false;}
+    }
+    char king = 'k';
+    if (board[pos.get_y_pos()][pos.get_x_pos()]->get_color() == 'b') {king = 'K';}
+    Position opposite_king = this->get_piece_pos(king);
+    int unit_x = 0;
+    if (opposite_king.get_x_pos() - pos.get_x_pos() != 0) {
+        unit_x = (opposite_king.get_x_pos() - pos.get_x_pos() > 0 ? 1 : -1);
+    }
+    int unit_y = 0;
+    if (opposite_king.get_y_pos() - pos.get_y_pos() != 0) {
+        unit_y = (opposite_king.get_y_pos() - pos.get_y_pos() > 0 ? 1 : -1);
+    }
+    int cur_x = pos.get_x_pos();
+    int cur_y = pos.get_y_pos();
+    while (cur_x != opposite_king.get_x_pos() || cur_y != opposite_king.get_y_pos()) {
+        if (is_pos_in_check(Position(cur_x, cur_y), board[pos.get_y_pos()][pos.get_x_pos()]->get_color())) {return true;}
+        cur_x += unit_x;
+        cur_y += unit_y;
+    }
+    return false;
+}
+
+void ChessBoard::check_turn_switch(string msg) {
+    string result = this->check_board();
+    bool has_game_ended = false;
+    if (result == "bc") {
+        score["Black"] += 1;
+        score[player[result[0]]] += 1;
+        has_game_ended = true;
+    }
+    else if (result == "wc") {
+        score["White"] += 1;
+        score[player[result[0]]] += 1;
+        has_game_ended = true;
+    }
+    else if (result == "s") {
+        score["White"] += 0.5;
+        score["Black"] += 0.5;
+        score[player['w']] += 0.5;
+        score[player['b']] += 0.5;
+        has_game_ended = true;
+    }
+    else {this->turn_switch();}
+    if (msg == "") {notifyObservers(result);}
+    else {
+        notifyObservers(msg + result);
+    }
+    if (has_game_ended) {
+        this->clear_board();
+    }
+}
+
+bool ChessBoard::is_stalemate(char colour) {
+    for (int i = 0; i < 8; ++i) {
+        for (int j = 0; j < 8; ++j) {
+            if ((board[i][j] != nullptr) && (board[i][j]->get_color() == colour)) {
+                for (int k = 0; k < 8; ++k) {
+                    for (int l = 0; l < 8; ++l) {
+                        if ((l != j || k != i) && board[i][j]->valid_move(this, Position(j,i), Position(l,k))) {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return true;
+}
+
+void ChessBoard::turn_switch() {
+    if (this->turn == 'w') {this->turn = 'b';}
+    else {this->turn = 'w';}
+}
+
+void ChessBoard::clear_board() {
+    this->make_empty_board();
+    this->pastMoves.clear();
+    player.clear();
+    this->turn = 'w';
+    this->mode = "pre game";
+}
+
+vector<vector<shared_ptr<Piece>>> ChessBoard::get_board() {return this->board;}
+
+void ChessBoard::set_mode(string mode) {this->mode = mode;}
+
+string ChessBoard::get_mode() {return this->mode;}
+
+Position ChessBoard::get_piece_pos(char piece) {
+    for (int i = 0; i < 8; ++i) {
+        for (int j = 0; j < 8; ++j) {
+            if (board[i][j] != nullptr && board[i][j]->get_symbol() == piece) {
+                return Position(j,i);
+            }
+        }
+    }
+    return Position(-1, -1);
+}
+
+Move ChessBoard::get_last_move() {return pastMoves.back();}
+
+int ChessBoard::get_num_moves() {return pastMoves.size();}
+
+char ChessBoard::get_turn() {return this->turn;}
+
+map<string, int> ChessBoard::get_score() {return this->score;}
+
+string ChessBoard::check_board() {
+    if (this->count_pieces() == 2) { // Checks basic stalemate case
+        return "stalemate";
+    }
+    bool white_checked = this->is_white_checked();
+    bool black_checked = this->is_black_checked();
+    bool white_stalemate = this->is_stalemate('w');
+    bool black_stalemate = this->is_stalemate('b');
+    // game can still be played "normal" state.
+    if (!white_stalemate && !black_stalemate && !white_checked && !black_checked) {return "n";}
+    // stalemate
+    if ((white_stalemate || black_stalemate) && !white_checked && !black_checked) {return "s";}
+    // Checks if any of the players ignored to get king out of check
+    if ((this->turn == 'w' && white_checked) || (this->turn == 'b' && black_checked)) {
+        this->undo();
+        throw Error{"Invalid move. You are/will be in check!"};
+    }
+    Move recent_move = this->get_last_move();
+    bool can_block = this->can_piece_block(recent_move.get_final_pos());
+    Position white_king_pos = this->get_piece_pos('K');
+    Position black_king_pos = this->get_piece_pos('k');
+    bool white_king_move = this->can_white_king_move(white_king_pos);
+    bool black_king_move = this->can_black_king_move(black_king_pos);
+    // white checkmates black
+    if (black_checked && !black_king_move && !can_block) {
+        return "we";
+    }
+    // black checkmates white
+    if (white_checked && !white_king_move && !can_block) {
+        return "be";
+    }
+    // white checks black
+    if (black_checked && (white_king_move || can_block)) {
+        return "wc";
+    }
+    // black checks white
+    if (white_checked && (black_king_move || can_block)) {
+        return "bc";
+    }
+    // Otherwise, return that the game can still be played, in other words "normal" state.
+    return "n";
+}
+
+void ChessBoard::start_game() {
+    if (player.size() != 2) {
+        throw Error{"Two players is required to play Chess."};
+    }
+    if (this->is_empty_board()) {
+        this->set_std_board();
+        this->turn = 'w';
+    }
+    if (turn != 'w' && turn != 'b') {turn = 'w';}
+    this->mode = "in game";
+    this->notifyObservers("normal");
+}
+
+void ChessBoard::add_player(string name, char colour) {
+    this->player[colour] = name;
+    if (name == "computer 1") {}
+    else if (name == "computer 2") {}
+    else if (name == "computer 3") {}
+    else if (name == "computer 4") {}
+}
+
+void ChessBoard::setup_add_piece(shared_ptr<Piece> piece, Position pos) {
+    board[pos.get_y_pos()][pos.get_x_pos()] = piece;
+}
+
+void ChessBoard::setup_remove_piece(Position pos) {
+    board[pos.get_y_pos()][pos.get_x_pos()] = nullptr;
+}
+
+void ChessBoard::setup_set_turn(char colour) {
+    this->turn = colour;
+}
+
+void ChessBoard::setup() {this->mode = "setup";}
+
+void ChessBoard::setup_done() {
+    Position white_king_pos = this->get_piece_pos('K');
+    Position black_king_pos = this->get_piece_pos('k');
+    if ((white_king_pos.get_x_pos() == -1 || white_king_pos.get_y_pos() == -1) || (black_king_pos.get_x_pos() == -1 || black_king_pos.get_y_pos() == -1)) {
+        throw Error{"Both the white and the black kings must be present in the game."};
+    }
+    if (is_white_checked() || is_black_checked()) {
+        throw Error{"Neither the black king nor the white king can be in check."};
+    }
+    for (int i = 0; i < 8; ++i) {
+        if ((board[0][i] != nullptr && board[0][i]->get_type() == 'p') || (board[7][i] != nullptr && board[7][i]->get_type() == 'p')) {
+            throw Error{"None of the pawns should be in the first or last rows."};
+        }
+    }
+    int white_king_count = 0;
+    int black_king_count = 0;
+    for (int i = 0; i < 8; ++i) {
+        for (int j = 0; j < 8; ++j) {
+            if (board[i][j] != nullptr && board[i][j]->get_symbol() == 'K') {white_king_count += 1;}
+            if (board[i][j] != nullptr && board[i][j]->get_symbol() == 'k') {black_king_count += 1;}
+        }
+    }
+    if (white_king_count != 1 || black_king_count != 1) {
+        throw Error{"There should be exactly one white king and black king!"};
+    }
+    this->mode = "pre game";
+}
+
+void ChessBoard::undo() {
+    int num_moves = pastMoves.size();
+    if (num_moves == 0) {
+        throw Error{"Cannot undo"};
+    }
+    Move recent_move = pastMoves.back();
+    board[recent_move.get_orig_pos().get_y_pos()][recent_move.get_orig_pos().get_x_pos()] = recent_move.get_piece();
+    board[recent_move.get_final_pos().get_y_pos()][recent_move.get_final_pos().get_x_pos()] = recent_move.get_removed_piece();
+    board[recent_move.get_orig_pos().get_y_pos()][recent_move.get_orig_pos().get_x_pos()]->sub_move_count();
+    if (recent_move.get_enpassant()) {
+        int move_unit = (recent_move.get_piece()->get_color() == 'w') ? -1 : 1;
+        if (recent_move.get_piece()->get_color() == 'w') {
+            board[recent_move.get_final_pos().get_y_pos() - move_unit][recent_move.get_final_pos().get_x_pos()] = make_shared<Pawn>('p');
+        } else {
+            board[recent_move.get_final_pos().get_y_pos() - move_unit][recent_move.get_final_pos().get_x_pos()] = make_shared<Pawn>('P');
+        }
+        board[recent_move.get_final_pos().get_y_pos() - move_unit][recent_move.get_final_pos().get_x_pos()]->add_move_count();
+    }
+    if (recent_move.get_castling()) {
+        if (recent_move.get_final_pos().get_x_pos() == 6 && recent_move.get_final_pos().get_y_pos() == 0) {
+            board[0][7] = board[0][5];
+            board[0][7]->sub_move_count();
+            board[0][5] = nullptr;
+        }
+        if (recent_move.get_final_pos().get_x_pos() == 2 && recent_move.get_final_pos().get_y_pos() == 0) {
+            board[0][0] = board[0][3];
+            board[0][0]->sub_move_count();
+            board[0][3] = nullptr;
+        }
+        if (recent_move.get_final_pos().get_x_pos() == 6 && recent_move.get_final_pos().get_y_pos() == 7) {
+            board[7][7] = board[7][5];
+            board[7][7]->sub_move_count();
+            board[7][5] = nullptr;
+        } else {
+            board[7][0] = board[7][3];
+            board[7][0]->sub_move_count();
+            board[7][3] = nullptr;
+        }
+    }
+    pastMoves.pop_back();
+}
+
+void ChessBoard::undo_all() {
     this->undo();
-  }
-  else if (prevMove.is_enpassant == true)
-  {
-    this->undo();
-  }
-  else if (prevMove.is_promotion == true)
-  {
-    delete this->board[prevMove.original_pos.x][prevMove.original_pos.y];
-    this->board[prevMove.original_pos.x][prevMove.original_pos.y] = nullptr;
-    if (prevMove.original_pos.x == 1)
-    {
-      this->setNewPiece(prevMove.original_pos.x, prevMove.original_pos.y, 'P');
-    }
-    else
-    {
-      this->setNewPiece(prevMove.original_pos.x, prevMove.original_pos.y, 'p');
-    }
-    if (this->round == 'w')
-    {
-      this->round = 'b';
-    }
-    else
-    {
-      this->round = 'w';
-    }
-  }
-  else
-  {
-    if (this->round == 'w')
-    {
-      this->round = 'b';
-    }
-    else
-    {
-      this->round = 'w';
-    }
-  }
+    check_turn_switch("u");
 }
-// The method works as what its name says;
-void ChessBoard::printBoardWithXYCordinates()
-{
-  cout << endl;
-  for (int x = 0; x < 8; x++)
-  {
-    cout << x << "|";
-    for (int y = 0; y < 8; y++)
-    {
-      if (this->board[x][y] != nullptr)
-      {
-        cout << this->getPieceAt(x, y)->get_symbol() << "|";
-      }
-      else
-      {
-        cout << " |";
-      }
+
+void ChessBoard::move(Position pos1, Position pos2, bool is_temp_move) {
+    if (computer[turn] != nullptr) {
+        throw Error{"Computer's turn"};
     }
-    cout << endl;
-  }
-  cout << "  ";
-  cout << "0 1 2 3 4 5 6 7" << endl;
-  cout << endl;
-  cout << endl;
-}
-// The method works as what its name says;
-void ChessBoard::printBoardWithStandardCordinates()
-{
-  cout << endl;
-  for (int x = 0; x < 8; x++)
-  {
-    cout << x << "|";
-    for (int y = 0; y < 8; y++)
-    {
-      if (this->board[x][y] != nullptr)
-      {
-        cout << this->getPieceAt(x, y)->get_symbol() << "|";
-      }
-      else
-      {
-        cout << " |";
-      }
+    if (board[pos1.get_y_pos()][pos1.get_x_pos()] == nullptr) {
+        throw Error{"No piece detected at current position."};
     }
-    cout << endl;
-  }
-  cout << "  ";
-  cout << "a b c d e f g h" << endl;
-  cout << endl;
-  cout << endl;
+    if (board[pos1.get_y_pos()][pos1.get_x_pos()]->get_color() != turn) {
+        throw Error{"Invalid colour."};
+    }
+    if (pos1.get_y_pos() == pos2.get_y_pos() && pos1.get_x_pos() == pos2.get_x_pos()) {
+        throw Error{"No movement of pieces detected."};
+    }
+    if (board[pos1.get_y_pos()][pos1.get_x_pos()]->get_type() == 'k') {
+        this->move_king(pos1, pos2);
+    }
+    else if (board[pos1.get_y_pos()][pos1.get_x_pos()]->get_type() == 'p') {
+        this->move_pawn(pos1, pos2);
+    } else {
+        if (board[pos1.get_y_pos()][pos1.get_x_pos()]->valid_move(this, pos1, pos2)) {
+            pastMoves.emplace_back(board[pos1.get_y_pos()][pos1.get_x_pos()], board[pos2.get_y_pos()][pos2.get_x_pos()], pos1, pos2, false, false, false);
+            board[pos2.get_y_pos()][pos2.get_x_pos()] = board[pos1.get_y_pos()][pos1.get_x_pos()];
+            board[pos1.get_y_pos()][pos1.get_x_pos()]->add_move_count();
+            board[pos1.get_y_pos()][pos1.get_x_pos()] = nullptr;
+        }
+        else {
+            throw Error{"Invalid move"};
+        }
+    }
+    if (!is_temp_move) {check_turn_switch();}
 }
-// Set a new piece base on x,y values.
-void ChessBoard::setNewPiece(int x, int y, char symbol)
-{
-  if (symbol == 'P' || symbol == 'p')
-  {
-    Piece *newPiecePtr = new Pawn{symbol};
-    this->board[x][y] = newPiecePtr;
-  }
-  else if (symbol == 'K' || symbol == 'k')
-  {
-    Piece *newPiecePtr = new King{symbol};
-    this->board[x][y] = newPiecePtr;
-  }
-  else if (symbol == 'N' || symbol == 'n')
-  {
-    Piece *newPiecePtr = new Pawn{symbol};
-    this->board[x][y] = newPiecePtr;
-  }
-  else if (symbol == 'R' || symbol == 'r')
-  {
-    Piece *newPiecePtr = new Rook{symbol};
-    this->board[x][y] = newPiecePtr;
-  }
-  else if (symbol == 'B' || symbol == 'b')
-  {
-    Piece *newPiecePtr = new Pawn{symbol};
-    this->board[x][y] = newPiecePtr;
-  }
-  else
-  {
-    Piece *newPiecePtr = new Queen{symbol};
-    this->board[x][y] = newPiecePtr;
-  }
+
+void ChessBoard::computer_move() {
+    if (computer[turn] == nullptr) {
+        throw Error{"Not computer's turn"};
+    }
+    vector<Position> positions = (computer[turn])->play(this);
+    this->move(positions[0], positions[1], false);
+}
+
+int ChessBoard::count_pieces() {
+    int count = 0;
+    for (int i = 0; i < 8; ++i) {
+        for (int j = 0; j < 8; ++j) {
+            if (board[i][j] != nullptr) {count += 1;}
+        }
+    }
+    return count;
+}
+
+void ChessBoard::resign() {
+    string result;
+    if (this->turn == 'w') {
+        result = "wr";
+        score["Black"] += 1;
+    } else {
+        result = "br";
+        score["White"] += 1;
+    }
+    char opposite_turn = (turn == 'w' ? 'b' : 'w');
+    score[player[opposite_turn]] += 1;
+    notifyObservers(result);
+    clear_board();
 }

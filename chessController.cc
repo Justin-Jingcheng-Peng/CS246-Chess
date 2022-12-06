@@ -15,27 +15,27 @@ using namespace std;
 
 ChessController::ChessController(ChessBoard *chessBoard) : chessBoard{chessBoard} {};
 
-void ChessController::start(string player1, string player2) {
-  if (chessBoard->get_game_mode() != "pre_game") {
-    throw GameError{"The current game mode is " + board->get_game_mode()};
+void ChessController::start_game(string player1, string player2) {
+  if (chessBoard->get_mode() != "pre_game") {
+    throw GameError{"The current game mode is " + board->get_mode()};
   }
 
-  chessBoard->addPlayer(player1, 'w');
-  chessBoard->addPlayer(player2, 'b');
-  chessBoard->start();
+  chessBoard->add_player(player1, 'w');
+  chessBoard->add_player(player2, 'b');
+  chessBoard->start_game();
 }
 
 void ChessController::resign() {
-  if (chessBoard->get_game_mode() != "game") {
-    throw GameError{"The current game mode is " + board->get_game_mode()};
+  if (chessBoard->get_mode() != "game") {
+    throw GameError{"The current game mode is " + board->get_mode()};
   }
 
   chessBoard->resign();
 }
 
 void ChessController::move(string move_commands) {
-  if (chessBoard->get_game_mode() != "game") {
-    throw GameError{"The current game mode is " + board->get_game_mode()};
+  if (chessBoard->get_mode() != "game") {
+    throw GameError{"The current game mode is " + board->get_mode()};
   }
 
   else if (move_commands == "") chessBoard->computer_move();
@@ -60,65 +60,65 @@ void ChessController::move(string move_commands) {
 }
 
 void ChessController::undo() {
-  if (chessBoard->get_game_mode() != "game") {
-    throw GameError{"The current game mode is " + board->get_game_mode()};
+  if (chessBoard->get_mode() != "game") {
+    throw GameError{"The current game mode is " + board->get_mode()};
   }
 
   chessBoard->undo();
 }
 
 void ChessController::setup() {
-  if (chessBoard->get_game_mode() != "pre_game") {
-    throw GameError{"The current game mode is " + board->get_game_mode()};
+  if (chessBoard->get_mode() != "pre_game") {
+    throw GameError{"The current game mode is " + board->get_mode()};
   }
 
   chessBoard->setup();
 }
 
-void ChessController::setup_addPiece(char piece, string position) {
-  if (chessBoard->get_game_mode() != "setup") {
-    throw GameError{"The current game mode is " + board->get_game_mode()};
+void ChessController::setup_add_piece(char piece, string position) {
+  if (chessBoard->get_mode() != "setup") {
+    throw GameError{"The current game mode is " + board->get_mode()};
   }
 
   if (piece == 'K' || piece == 'k') {
-    chessBoard->setup_addPiece(make_shared<King>(piece), create_position(position));
+    chessBoard->setup_add_piece(make_shared<King>(piece), create_position(position));
   }
   else if (piece == 'Q' || piece == 'q') {
-    chessBoard->setup_addPiece(make_shared<Queen>(piece), create_position(position));
+    chessBoard->setup_add_piece(make_shared<Queen>(piece), create_position(position));
   }
   else if (piece == 'R' || piece == 'r') {
-    chessBoard->setup_addPiece(make_shared<Rook>(piece), create_position(position));
+    chessBoard->setup_add_piece(make_shared<Rook>(piece), create_position(position));
   }
   else if (piece == 'B' || piece == 'b') {
-    chessBoard->setup_addPiece(make_shared<Bishop>(piece), create_position(position));
+    chessBoard->setup_add_piece(make_shared<Bishop>(piece), create_position(position));
   }
   else if (piece == 'N' || piece == 'n') {
-    chessBoard->setup_addPiece(make_shared<Knight>(piece), create_position(position));
+    chessBoard->setup_add_piece(make_shared<Knight>(piece), create_position(position));
   }
   else if (piece == 'P' || piece == 'p') {
-    chessBoard->setup_addPiece(make_shared<Pawn>(piece), create_position(position));
+    chessBoard->setup_add_piece(make_shared<Pawn>(piece), create_position(position));
   }
 }
 
-void ChessController::setup_removePiece(string position) {
-  if (chessBoard->get_game_mode() != "setup") {
-    throw GameError{"The current game mode is " + board->get_game_mode()};
+void ChessController::setup_remove_piece(string position) {
+  if (chessBoard->get_mode() != "setup") {
+    throw GameError{"The current game mode is " + board->get_mode()};
   }
 
-  chessBoard->setup_removePiece(create_position(position));
+  chessBoard->setup_remove_piece(create_position(position));
 }
 
-void ChessController::setup_setColorTurn(char color) {
-  if (chessBoard->get_game_mode() != "setup") {
-    throw GameError{"The current game mode is " + board->get_game_mode()};
+void ChessController::setup_set_turn(char color) {
+  if (chessBoard->get_mode() != "setup") {
+    throw GameError{"The current game mode is " + board->get_mode()};
   }
 
-  chessBoard->setup_setColorTurn();
+  chessBoard->setup_set_turn();
 }
 
 void ChessController::setup_done() {
-  if (chessBoard->get_game_mode() != "setup") {
-    throw GameError{"The current game mode is " + board->get_game_mode()};
+  if (chessBoard->get_mode() != "setup") {
+    throw GameError{"The current game mode is " + board->get_mode()};
   }
 
   chessBoard->setup_done();
