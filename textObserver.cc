@@ -1,6 +1,5 @@
 #include "textObserver.h"
 #include "observer.h"
-#include "chessBoard.h"
 
 using namespace std;
 
@@ -9,53 +8,60 @@ TextObserver::TextObserver(ChessBoard *chessBoard) : chessBoard{chessBoard} {
 }
 
 TextObserver::~TextObserver() {
-  // map<string, int> score = chessBoard->get_score();
-  // cout << "Final Score:" << endl;
-  // for (auto it = score.begin(); it != score.end(); ++it) {
-  //   cout << it->first << ": " << it->second << endl;
-  // }
-  
+  map<string, int> score = chessBoard->get_score();
+  cout << "Final Score:" << endl;
+  map<string, int>::iterator it;
+  for (it = score.begin(); it != score.end(); ++it) {
+    cout << it->first << ": " << it->second << endl;
+  }
   chessBoard->detach(this);
 }
 
 TextObserver::notify(string gameResult) {
   if (gameResult != "sr") {
-    std::vector<std::vector<std::shared_ptr<Piece>>> board_arr = chessBoard->get_board();
+    vector<vector<shared_ptr<Piece>>> board_arr = chessBoard->get_board();
     for (int i = 0; i < 8; ++i) {
       for (int j = 0; j < 8; ++j) {
         if (board_arr[i][j] == nullptr) {
-          if ((i+j) % 2 == 1) {std::cout << '_';}
-          else {std::cout << ' ';}
+          if ((i+j) % 2 == 1) {cout << '_';}
+          else {cout << ' ';}
         }
         else{
-          std::cout << chessBoard[i][j]->get_symbol();
+          cout << chessBoard[i][j]->get_symbol();
         }
       }
-      std::cout << std::endl;
+      cout << endl;
     }
   }
-  std::cout << std::endl << "  abcdefgh" << std::endl;
-  std::cout << std::endl << std::endl;
+  cout << endl << "  abcdefgh" << endl;
+  cout << endl << endl;
   if (gameResult == "be" || gameResult == "ube") {
-    std::cout << "Checkmate! Black wins!" << std::endl;
+    cout << "Checkmate! Black wins!" << endl;
   }
   else if (gameResult == "we" || gameResult == "uwe") {
-    std::cout << "Checkmate! White wins!" << std::endl;
+    cout << "Checkmate! White wins!" << endl;
   }
   else if (gameResult == "wc" || gameResult == "uwc") {
-    std::cout << "Black in check." << std::endl;
+    cout << "Black in check." << endl;
   }
   else if (gameResult == "bc" || gameResult == "ubc") {
-    std::cout << "White in check." << std::endl;
+    cout << "White in check." << endl;
   }
   else if (gameResult == "s" || gameResult == "us") {
-    std::cout << "Stalemate!" << std::endl;
+    cout << "Stalemate!" << endl;
   }
   else if (gameResult == "wr" || gameResult == "uwr") {
-    std::cout << "Black wins!" << std::endl;
+    cout << "Black wins!" << endl;
   }
   else if (gameResult == "br" || gameResult == "ubr") {
-    std::cout << "White wins!" << std::endl;
+    cout << "White wins!" << endl;
   }
-  if (gameResult == "s" || )
+  if (gameResult == "s" || gameResult == "us" || gameResult == "we" || gameResult == "uwe" || gameResult == "be" || gameResult == "ube" || gameResult == "sr" || gameResult == "wr" || gameResult == "uwr" || gameResult == "br" || gameResult == "ubr") {
+    map<string, int> score = chessBoard->get_score();
+    cout << endl << "Final Score:" << endl;
+    map<string, int>::iterator it;
+    for (it = score.begin(); it != score.end(); it++) {
+      cout << it->first << ": " << it->second << endl;
+    }
+  }
 }

@@ -4,6 +4,7 @@
 #include <vector>
 #include <memory>
 #include <iostream>
+#include <map>
 #include "chessBoard.h"
 
 using namespace string;

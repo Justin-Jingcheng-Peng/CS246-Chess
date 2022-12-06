@@ -2,6 +2,8 @@
 #define KING_H
 #include "piece.h"
 #include <cmath>
+#include <vector>
+#include <
 
 class King: public Piece {
   private:  

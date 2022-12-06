@@ -6,5 +6,5 @@
 vector<Position> LevelOne::play(ChessBoard *chessBoard) {
   vector<vector<Position>> moves = get_moves(chessBoard, chessBoard->get_turn());
   int numOfMoves = moves.size();
-  return moves[get_random(0, numOfMoves)];
+  return moves[randomizer(0, numOfMoves)];
 }

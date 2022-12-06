@@ -14,7 +14,7 @@ vector<Position> LevelTwo::play(ChessBoard *chessBoard) {
   int numOfAttackingMoves = attackingMoves.size();
   int numOfCheckMoves = checkMoves.size();
 
-  if (numOfAttackingMoves != 0) return attackingMoves[get_random(0, numOfAttackingMoves)];
-  if (numOfCheckMoves != 0) return checkMoves[get_random(0, numOfCheckMoves)];
-  else return moves[get_random(0, numOfMoves)];
+  if (numOfAttackingMoves != 0) return attackingMoves[randomizer(0, numOfAttackingMoves)];
+  if (numOfCheckMoves != 0) return checkMoves[randomizer(0, numOfCheckMoves)];
+  else return moves[randomizer(0, numOfMoves)];
 }

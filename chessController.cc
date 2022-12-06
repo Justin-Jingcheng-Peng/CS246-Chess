@@ -52,10 +52,10 @@ void ChessController::move(string move_commands) {
 
     if (size == 3) {
       char promotedPawn = mc[2][0];
-      chessBoard->move_promotion(from, to, promotedPawn);
+      chessBoard->move_promote(from, to, promotedPawn);
     }
 
-    else chessBoard->move_promotion(from, to, promotedPawn);
+    else chessBoard->move(from, to, false);
   }
 }
 
@@ -64,7 +64,7 @@ void ChessController::undo() {
     throw GameError{"The current game mode is " + board->get_mode()};
   }
 
-  chessBoard->undo();
+  chessBoard->undo_all();
 }
 
 void ChessController::setup() {
@@ -128,7 +128,7 @@ Position ChessController::create_position(string coordinate) {
   Position coord = Position(coordinate[0] - 'a', 7 - coordinate[1] + '1');
   
   if (coord.get_x_pos() < 0 || coord.get_y_pos() < 0 || coord.get_x_pos() > 7 || coord.get_y_pos() > 7) {
-		throw GameError{"not a valid position"};
+		throw GameError{"It is not a valid position."};
 	}
   
   return coord;

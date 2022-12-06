@@ -101,14 +101,14 @@ void ChessBoard::move_king(Position pos1, Position pos2) {
     }
 }
 
-bool ChessBoard::is_pos_in_check(Position pos, char colour) {
+bool ChessBoard::is_pos_in_check(Position pos, char color) {
     // imagine it being filled with a piece.
     shared_ptr<Piece> temp = board[pos.get_y_pos()][pos.get_x_pos()];
-    char queen = (colour == 'w' ? 'Q' : 'q');
+    char queen = (color == 'w' ? 'Q' : 'q');
     board[pos.get_y_pos()][pos.get_x_pos()] = make_shared<Queen>(queen);
     for (int i = 0; i < 8; ++i) {
         for (int j = 0; j < 8; ++j) {
-            if ((board[i][j] == nullptr) || (board[i][j]->get_color() == colour)) {continue;}
+            if ((board[i][j] == nullptr) || (board[i][j]->get_color() == color)) {continue;}
             if (board[i][j]->valid_move(this, Position(j,i), pos)) {
                 board[pos.get_y_pos()][pos.get_x_pos()] = temp;
                 return true;
@@ -206,9 +206,9 @@ void ChessBoard::move_promote(Position pos1, Position pos2, char promote) {
 }
 
 void ChessBoard::promote_pawn(Position pos1, Position pos2, char promoted_to) {
-    char colour = (promoted_to < 'a' ? 'w' : 'b');
-    if (colour != board[pos1.get_y_pos()][pos1.get_x_pos()]->get_color()) {
-        throw Error{"The colour of the promoted piece and the original piece do not match."};
+    char color = (promoted_to < 'a' ? 'w' : 'b');
+    if (color != board[pos1.get_y_pos()][pos1.get_x_pos()]->get_color()) {
+        throw Error{"The color of the promoted piece and the original piece do not match."};
     }
     pastMoves.emplace_back(board[pos1.get_y_pos()][pos1.get_x_pos()], board[pos2.get_y_pos()][pos2.get_x_pos()], pos1, pos2, false, false, true);
     board[pos1.get_y_pos()][pos1.get_x_pos()] = nullptr;
@@ -281,10 +281,10 @@ void ChessBoard::check_turn_switch(string msg) {
     }
 }
 
-bool ChessBoard::is_stalemate(char colour) {
+bool ChessBoard::is_stalemate(char color) {
     for (int i = 0; i < 8; ++i) {
         for (int j = 0; j < 8; ++j) {
-            if ((board[i][j] != nullptr) && (board[i][j]->get_color() == colour)) {
+            if ((board[i][j] != nullptr) && (board[i][j]->get_color() == color)) {
                 for (int k = 0; k < 8; ++k) {
                     for (int l = 0; l < 8; ++l) {
                         if ((l != j || k != i) && board[i][j]->valid_move(this, Position(j,i), Position(l,k))) {
@@ -338,7 +338,7 @@ map<string, int> ChessBoard::get_score() {return this->score;}
 
 string ChessBoard::check_board() {
     if (this->count_pieces() == 2) { // Checks basic stalemate case
-        return "stalemate";
+        return "s";
     }
     bool white_checked = this->is_white_checked();
     bool black_checked = this->is_black_checked();
@@ -392,8 +392,8 @@ void ChessBoard::start_game() {
     this->notifyObservers("normal");
 }
 
-void ChessBoard::add_player(string name, char colour) {
-    this->player[colour] = name;
+void ChessBoard::add_player(string name, char color) {
+    this->player[color] = name;
     if (name == "computer 1") {}
     else if (name == "computer 2") {}
     else if (name == "computer 3") {}
@@ -408,8 +408,8 @@ void ChessBoard::setup_remove_piece(Position pos) {
     board[pos.get_y_pos()][pos.get_x_pos()] = nullptr;
 }
 
-void ChessBoard::setup_set_turn(char colour) {
-    this->turn = colour;
+void ChessBoard::setup_set_turn(char color) {
+    this->turn = color;
 }
 
 void ChessBoard::setup() {this->mode = "setup";}
@@ -497,7 +497,7 @@ void ChessBoard::move(Position pos1, Position pos2, bool is_temp_move) {
         throw Error{"No piece detected at current position."};
     }
     if (board[pos1.get_y_pos()][pos1.get_x_pos()]->get_color() != turn) {
-        throw Error{"Invalid colour."};
+        throw Error{"Invalid color."};
     }
     if (pos1.get_y_pos() == pos2.get_y_pos() && pos1.get_x_pos() == pos2.get_x_pos()) {
         throw Error{"No movement of pieces detected."};

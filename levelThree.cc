@@ -14,8 +14,8 @@ vector<Position> LevelThree::play(ChessBoard *chessBoard) {
   int numOfEscapingMoves = escapingMoves.size();
   int numOfCheckMoves = checkMoves.size();
 
-  if (numOfAttackingMoves != 0) return attackingMoves[get_random(0, numOfAttackingMoves)];
-  if (numOfCheckMoves != 0) return checkMoves[get_random(0, numOfCheckMoves)];
-  if (numOfEscapingMoves != 0) return escapingMoves[get_random(0, numOfEscapingMoves)];
-  else return moves[get_random(0, numOfMoves)];
+  if (numOfAttackingMoves != 0) return attackingMoves[randomizer(0, numOfAttackingMoves)];
+  if (numOfCheckMoves != 0) return checkMoves[randomizer(0, numOfCheckMoves)];
+  if (numOfEscapingMoves != 0) return escapingMoves[randomizer(0, numOfEscapingMoves)];
+  else return moves[randomizer(0, numOfMoves)];
 }
