@@ -3,6 +3,7 @@
 #include "piece.h"
 #include <cmath>
 #include <vector>
+#include <memory>
 
 class Bishop: public Piece {
   private:  
