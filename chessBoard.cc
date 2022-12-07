@@ -84,7 +84,7 @@ string ChessBoard::check_board() {
         this->undo();
         throw Error{"Invalid. You are/will be in check!"};
     }
-    Move recent_move = this->get_last_move();
+    Move recent_move = pastMoves[pastMoves.size() - 1];
     bool can_defend = this->is_piece_blockable(recent_move.get_final_pos());
     bool white_king_can_move = this->can_piece_move(this->get_piece_pos('K'));
     bool black_king_can_move = this->can_piece_move(this->get_piece_pos('k'));
@@ -190,7 +190,7 @@ void ChessBoard::undo() {
     if (move_count == 0) {
         throw Error{"Cannot undo any further."};
     }
-    Move recent_move = this->get_last_move();
+    Move recent_move = pastMoves[move_count - 1];
     board[recent_move.get_orig_pos().get_y_pos()][recent_move.get_orig_pos().get_x_pos()] = recent_move.get_piece();
     board[recent_move.get_final_pos().get_y_pos()][recent_move.get_final_pos().get_x_pos()] = recent_move.get_removed_piece();
     board[recent_move.get_orig_pos().get_y_pos()][recent_move.get_orig_pos().get_x_pos()]->sub_move_count();
@@ -313,7 +313,7 @@ void ChessBoard::move_king(Position pos1, Position pos2) {
         throw Error{"Invalid King/Castling move"};
     }
     if (pos1.dist_squared(pos2) <= 2) {
-        pastMoves.emplace_back(board[pos1.get_y_pos()][pos2.get_x_pos()], board[pos2.get_y_pos()][pos2.get_x_pos()], pos1, pos2, false, false, false);
+        pastMoves.emplace_back(board[pos1.get_y_pos()][pos1.get_x_pos()], board[pos2.get_y_pos()][pos2.get_x_pos()], pos1, pos2, false, false, false);
         board[pos2.get_y_pos()][pos2.get_x_pos()] = board[pos1.get_y_pos()][pos1.get_x_pos()];
         board[pos1.get_y_pos()][pos1.get_x_pos()]->add_move_count();
         board[pos1.get_y_pos()][pos1.get_x_pos()] = nullptr;
@@ -395,13 +395,17 @@ void ChessBoard::move_pawn(Position pos1, Position pos2) {
 }
 
 void ChessBoard::make_empty_board() {
-    // board.clear();
+    bool make_board = true;
+    if (board.size() != 0) {
+        make_board = false;
+    }
     for (int i = 0; i < 8; ++i) {
         vector<shared_ptr<Piece>> row;
         for (int j = 0; j < 8; ++j) {
             row.push_back(nullptr);
+            if (!make_board) {board[i][j] = nullptr;}
         }
-        board.push_back(row);
+        if (make_board) {board.push_back(row);}
     }
 }
 
@@ -517,7 +521,7 @@ void ChessBoard::change_turn() {
     }
 }
 
-Move ChessBoard::get_last_move() {return pastMoves.back();}
+Move ChessBoard::get_last_move() {return pastMoves[pastMoves.size() - 1];}
 
 int ChessBoard::get_num_moves() {return pastMoves.size();} 
 

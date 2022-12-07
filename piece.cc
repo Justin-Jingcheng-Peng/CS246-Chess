@@ -14,7 +14,8 @@ char Piece::get_symbol()
 
 char Piece::get_type()
 {
-  return this->symbol - 'a';
+  if (this->symbol < 'a') {return this->symbol - 'A' + 'a';}
+  return this->symbol;
 }
 
 char Piece::get_color()

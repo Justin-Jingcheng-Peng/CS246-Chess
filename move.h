@@ -2,9 +2,8 @@
 #define MOVE_H
 #include <string>
 #include <memory>
+#include "piece.h"
 #include "position.h"
-
-class Piece;
 
 class Move
 {
