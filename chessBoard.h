@@ -1,5 +1,5 @@
 #ifndef CHESSBOARD_H
-#define CHESBOARD_H
+#define CHESSBOARD_H
 
 #include "subject.h"
 #include <memory>
