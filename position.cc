@@ -9,3 +9,7 @@ int Position::get_x_pos() {
 int Position::get_y_pos() {
   return this->y;
 }
+
+int Position::dist_squared(Position pos) {
+  return (pos.get_x_pos() - x) * (pos.get_x_pos() - x) + (pos.get_y_pos() - y) * (pos.get_y_pos() - y);
+}

@@ -9,7 +9,6 @@
 class GraphicsObserver : public Observer
 {
   ChessBoard * board;
-  //Xwindow *xw = nullptr;
   std::shared_ptr<Xwindow> xw = nullptr;
   bool is_red = false;
 public:

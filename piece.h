@@ -6,6 +6,7 @@
 #include <memory>
 
 class ChessBoard;
+
 class Piece
 {
   private:

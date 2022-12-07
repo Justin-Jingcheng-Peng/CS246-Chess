@@ -8,7 +8,7 @@ TextObserver::TextObserver(ChessBoard *chessBoard) : chessBoard{chessBoard} {
 }
 
 TextObserver::~TextObserver() {
-  map<string, int> score = chessBoard->get_score();
+  map<string, int> score = chessBoard->get_scores();
   cout << "Final Score:" << endl;
   map<string, int>::iterator it;
   for (it = score.begin(); it != score.end(); ++it) {
@@ -57,7 +57,7 @@ void TextObserver::notify(string gameResult) {
     cout << "White wins!" << endl;
   }
   if (gameResult == "s" || gameResult == "us" || gameResult == "we" || gameResult == "uwe" || gameResult == "be" || gameResult == "ube" || gameResult == "sr" || gameResult == "wr" || gameResult == "uwr" || gameResult == "br" || gameResult == "ubr") {
-    map<string, int> score = chessBoard->get_score();
+    map<string, int> score = chessBoard->get_scores();
     cout << endl << "Final Score:" << endl;
     map<string, int>::iterator it;
     for (it = score.begin(); it != score.end(); it++) {

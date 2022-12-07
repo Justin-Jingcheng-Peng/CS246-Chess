@@ -1,6 +1,4 @@
 #include "chessController.h"
-#include "chessBoard.h"
-#include "position.h"
 #include "piece.h"
 #include "king.h"
 #include "queen.h"
@@ -10,6 +8,7 @@
 #include "pawn.h"
 #include <iostream>
 #include <sstream>
+#include <string>
 
 using namespace std;
 

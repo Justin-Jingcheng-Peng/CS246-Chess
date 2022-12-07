@@ -30,7 +30,7 @@ vector<vector<Position>> ComputerPlayer::get_moves(ChessBoard *chessBoard, char 
                 throw;
               }
               
-              if (!chessBoard->is_pos_in_check(kingPosition, chessBoard->get_turn())) {
+              if (!chessBoard->is_position_check(kingPosition, chessBoard->get_turn())) {
                 moves.push_back({Position(j,i), Position(l,k)});
               }
 
@@ -94,7 +94,7 @@ vector<vector<Position>> ComputerPlayer::get_check_moves(ChessBoard *chessBoard,
 
   for (int i = 0; i < numOfMoves; i++) {
     chessBoard->move(moves[i][0], moves[i][1], true);
-    if (chessBoard->is_pos_in_check(kingPosition, color)) {
+    if (chessBoard->is_position_check(kingPosition, color)) {
       checkMoves.emplace_back(moves[i]);
     }
 
@@ -134,7 +134,7 @@ int ComputerPlayer::num_of_attackable_pieces(ChessBoard *chessBoard) {
       if (theBoard[i][j] != nullptr && 
       (theBoard[i][j]->get_color() == chessBoard->get_turn()) && 
       theBoard[i][j]->get_type() == 'k' &&
-      chessBoard->is_pos_in_check(Position(j,i), chessBoard->get_turn())) {
+      chessBoard->is_position_check(Position(j,i), chessBoard->get_turn())) {
         num++;
       }
     }

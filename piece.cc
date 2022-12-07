@@ -1,8 +1,12 @@
 #include "piece.h"
 #include <iostream>
+
 using namespace std;
+
 Piece::Piece(char symbol) : symbol{symbol}, move_count{0} {}
+
 Piece::~Piece() {}
+
 char Piece::get_symbol()
 {
   return this->symbol;

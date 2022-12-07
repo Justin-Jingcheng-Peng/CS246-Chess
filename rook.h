@@ -5,7 +5,7 @@
 
 class Rook: public Piece {
   private:  
-    int move_count = 0;
+    
   public:  
     // ctor for Rook
     Rook(char symbol);

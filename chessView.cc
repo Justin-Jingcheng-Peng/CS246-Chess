@@ -1,7 +1,4 @@
-#include "chessController.h"
 #include "chessView.h"
-#include "chessBoard.h"
-#include "observer.h"
 #include "textObserver.h"
 #include "graphicsObserver.h"
 #include <iostream>
